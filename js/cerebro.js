@@ -86,8 +86,13 @@
     nome: null, idade: null, turnos: 0, respostas: 0,
     ultimaNorm: '', repeticoes: 0, insultos: 0,
     tema: null, maisTexto: null, espera: null,
-    aguardandoNome: false, pediuNome: false, ultimaResposta: ''
+    aguardandoNome: false, pediuNome: false, ultimaResposta: '',
+    ultimaRegra: null, jogo: null, cantando: 0, aguaVezes: 0, lugar: null
   };
+
+  function sorteia(a) { return a[Math.floor(Math.random() * a.length)]; }
+  // põe "!" no fim da frase, se ela ainda não terminar com pontuação
+  function fim(s) { return /[.!?]\)?$/.test(s) ? s : s + '!'; }
 
   /* ---------------- bancos de respostas ---------------- */
   var DICAS_LISTA = [
@@ -153,9 +158,143 @@
     'A Lua não tem luz própria: ela só reflete a luz do Sol.'
   ]);
 
+  var DICAS_AGUA = sacola([
+    'Enquanto escova os dentes, deixe a torneira fechada. Só isso já poupa vários litros por dia!',
+    'Banho de 5 minutos é suficiente! E feche o chuveiro enquanto se ensaboa.',
+    'Torneira pingando? Conserte logo: uma gotinha por segundo vira dezenas de litros por dia.',
+    'Para limpar a calçada, use vassoura e balde em vez de mangueira. Mangueira não é vassoura!',
+    'Lave o carro com balde e pano, nada de mangueira aberta.',
+    'Na hora de lavar a louça, ensaboe tudo com a torneira fechada e enxágue tudo de uma vez.',
+    'Junte bastante roupa antes de ligar a máquina. E a água do último enxágue pode ser reaproveitada pra lavar o quintal!',
+    'Regue as plantas de manhã cedo ou no fim da tarde, quando o sol não evapora a água tão rápido.',
+    'Vaso sanitário não é lixeira! Cada descarga à toa leva muitos litros de água embora.',
+    'Quer saber se tem vazamento escondido? Feche todas as torneiras e veja se o relógio da água, o hidrômetro, continua girando.',
+    'Dá pra guardar água da chuva num reservatório e usar pra regar as plantas e lavar o quintal.',
+    'Ensaboe as mãos com a torneira fechada e só abra pra enxaguar.'
+  ]);
+
+  var INTRO_DICAS = sacola(['Tenho várias dicas para poupar energia:', 'Dica de economia é comigo mesmo! Anota aí:', 'Lá vão umas dicas fresquinhas:']);
+
   var POOLS = { dicas: DICAS, piadas: PIADAS, curiosidades: CURIOSIDADES };
 
   function dica() { ctx.tema = 'dicas'; return DICAS.prox() + ' {{Mais?|mais uma dica}}'; }
+  // três dicas em lista, do jeito que o Ed original respondia
+  function listaDicas() {
+    ctx.tema = 'dicas';
+    return INTRO_DICAS.prox() + '\n- ' + DICAS.prox() + '\n- ' + DICAS.prox() + '\n- ' + DICAS.prox() + ' {{Mais?|mais dicas}}';
+  }
+  function dicaAgua() { ctx.tema = 'agua'; return DICAS_AGUA.prox() + ' {{Outra?|outra dica de água}}'; }
+
+  /* ---------------- nomes, lugares e famosos (js/nomes.js) ---------------- */
+  var DADOS = global.EdNomes || {};
+  var NOMES = DADOS.nomes || {};
+  var LETRAS = DADOS.letras || {};
+  function infoNome(chave) { return chave && Object.prototype.hasOwnProperty.call(NOMES, chave) ? NOMES[chave] : null; }
+
+  // "O nome Guilherme me lembra..." (o comentário que todo mundo lembra do Ed)
+  function comentarNome(nome, info, primeiro) {
+    primeiro = primeiro || nome;
+    if (!info) {
+      var letra = semAcento(nome.charAt(0).toLowerCase());
+      var w = LETRAS[letra];
+      var ops = ['Que nome bonito, ' + nome + '! Prazer em te conhecer.',
+                 nome + '! Esse nome eu ainda não tinha na memória. Acabei de guardar, com carinho.'];
+      if (w) {
+        ops.push(nome + ' começa com ' + letra.toUpperCase() + ', de ' + w + '! Gostei. Prazer em te conhecer!');
+        ops.push('Prazer, ' + nome + '! ' + letra.toUpperCase() + ' de ' + w + ', um dos meus assuntos preferidos.');
+      }
+      return sorteia(ops);
+    }
+    var partes = [];
+    if (info.l && info.l.length) {
+      var l = sorteia(info.l);
+      partes.push(fim(sorteia(['O nome ' + primeiro + ' me lembra ' + l, primeiro + '? Esse nome me lembra ' + l, 'Hmm, ' + primeiro + '... me lembra ' + l])));
+    } else {
+      partes.push('Que nome bonito, ' + nome + '!');
+    }
+    var extras = [];
+    if (info.x) extras.push(info.x);
+    if (info.s) extras.push('Sabia que ' + primeiro + ' quer dizer "' + info.s + '"?');
+    if (extras.length) partes.push(sorteia(extras));
+    // nome composto: o fim sempre fala o nome inteiro
+    partes.push(nome !== primeiro ? 'Prazer, ' + nome + '!' : sorteia(['Prazer em te conhecer!', 'Muito prazer!', 'Prazer, ' + nome + '!']));
+    return partes.join(' ');
+  }
+
+  // o que o Ed sabe sobre um nome qualquer ("o nome Pedro significa o quê?")
+  function falarDoNome(info) {
+    var t = [];
+    if (info.l && info.l.length) t.push(fim('O nome ' + info.d + ' me lembra ' + sorteia(info.l)));
+    if (info.s) t.push(info.d + ' quer dizer "' + info.s + '".');
+    if (info.x) t.push(info.x);
+    if (!t.length) t.push(info.d + '? Que nome bonito!');
+    return t.join(' ');
+  }
+
+  function porTamanho(a, b) { return b.length - a.length; }
+
+  var LUGARES = [], GENTILICOS = {};
+  (DADOS.lugares || []).forEach(function (l) {
+    l[0].split('|').forEach(function (k) {
+      LUGARES.push({ k: k, re: new RegExp('^(?:o |a |os |as )?' + k + '\\b'), d: l[1], t: l[2] });
+    });
+    if (l[3]) l[3].split('|').forEach(function (g) { GENTILICOS[g] = { d: l[1], t: l[2] }; });
+  });
+  LUGARES.sort(function (a, b) { return porTamanho(a.k, b.k); });
+  var GENTILICO_RE = new RegExp('\\b(?:eu )?sou (' + (Object.keys(GENTILICOS).sort(porTamanho).join('|') || 'x^') + ')\\b');
+  function acharLugar(resto) {
+    for (var i = 0; i < LUGARES.length; i++) if (LUGARES[i].re.test(resto)) return LUGARES[i];
+    return null;
+  }
+
+  var FAMOSOS = (DADOS.famosos || []).map(function (f) {
+    return { re: new RegExp('\\b(' + f[0] + ')\\b'), t: f[1], amb: !!f[2] };
+  });
+  var FAMOSOS_RE = new RegExp('\\b(' + ((DADOS.famosos || []).map(function (f) { return f[0]; }).join('|') || 'x^') + ')\\b');
+  // nomes ambíguos ("pele", "chaves") só contam quando a pessoa pergunta deles
+  var FALA_DE_ALGUEM = /\b(conhece|conheceu|sabe quem|gosta|gostava|ouviu falar|viu|assiste|assistia|lembra|quem e|quem foi|fala d|acha d)/;
+  function acharFamoso(norm) {
+    for (var i = 0; i < FAMOSOS.length; i++) {
+      var f = FAMOSOS[i];
+      if (f.re.test(norm) && (!f.amb || FALA_DE_ALGUEM.test(norm))) return f;
+    }
+    return null;
+  }
+
+  /* ---------------- brincadeiras com estado ---------------- */
+  var PERGUNTAS = sacola([
+    { q: 'Você apaga a luz quando sai de um cômodo?', sim: 'Muito bem! Você já é um Guardião da Energia.', nao: 'Ih! A partir de hoje, combinado? É a dica mais fácil do mundo.' },
+    { q: 'Você fecha a torneira enquanto escova os dentes?', sim: 'Isso aí! Assim você poupa vários litros por dia.', nao: 'Então experimenta amanhã: torneira fechada e só abre pra enxaguar. A água agradece!' },
+    { q: 'Seu banho dura menos de 10 minutos?', sim: 'Ótimo! Seu chuveiro e o planeta agradecem.', nao: 'Tenta encurtar um pouquinho por dia. Cinco minutinhos já bastam!' },
+    { q: 'Você separa o lixo reciclável em casa?', sim: 'Parabéns! Reciclar economiza matéria-prima, água e energia.', nao: 'Que tal começar? Separar o lixo seco do molhado já é um ótimo começo!' },
+    { q: 'Você tira o carregador da tomada quando o celular termina de carregar?', sim: 'Boa! Carregador esquecido na tomada continua gastando um pouquinho.', nao: 'Pois é, carregador na tomada sem celular continua gastando! Tira ele de lá, combinado?' },
+    { q: 'Você sabia que a Lua não tem luz própria?', sim: 'Sabido, hein! Ela só reflete a luz do Sol.', nao: 'Pois é! A Lua só reflete a luz do Sol. Aprendeu uma hoje!' },
+    { q: 'Você sabia que o vento é, no fundo, energia do Sol?', sim: 'Uau, você manja! O Sol esquenta o ar de forma desigual, e aí nasce o vento.', nao: 'É verdade! O Sol esquenta o ar de forma desigual, o ar se mexe, e isso é o vento!' }
+  ]);
+
+  function cantorLatino() {
+    ctx.cantando = 1;
+    return { t: 'Ahh, o cantor! Ele é muito animado. Vamos cantar?', h: 'feliz',
+      espera: {
+        sim: function () { ctx.cantando = 1; return { t: '♪ Bip-bip-biiip, bop-bop! ♪ Começa você, que eu só sei o ritmo!', h: 'feliz', semPedirNome: true }; },
+        nao: 'Tudo bem, minha voz de lata agradece. Hehe.'
+      } };
+  }
+
+  var NUMEROS = { um: 1, uma: 1, dois: 2, duas: 2, tres: 3, quatro: 4, cinco: 5, seis: 6, sete: 7, oito: 8, nove: 9, dez: 10 };
+  var DE_NOVO = ' {{Jogar de novo?|vamos adivinhar um número}}';
+  function jogada(chute) {
+    var j = ctx.jogo;
+    j.tent++;
+    if (chute === j.n) {
+      ctx.jogo = null;
+      return { t: sorteia(['Acertou! Era o ' + j.n + '!', 'Na mosca! Era o ' + j.n + '!']) +
+        (j.tent === 1 ? ' De primeira! Você lê pensamento de robô?' : ' Acertou em ' + j.tent + ' tentativas.') + DE_NOVO, h: 'surpreso', semPedirNome: true };
+    }
+    if (chute < 1 || chute > 10) return { t: 'Eita, é de 1 a 10! Tenta de novo.', h: 'piscando', semPedirNome: true };
+    if (j.tent >= 4) { ctx.jogo = null; return { t: 'Não foi dessa vez! Era o ' + j.n + '.' + DE_NOVO, h: 'piscando', semPedirNome: true }; }
+    return { t: (chute < j.n ? 'É mais que ' + chute + '!' : 'É menos que ' + chute + '!') + ' Tenta de novo.', h: 'pensando', semPedirNome: true };
+  }
   function piada() { ctx.tema = 'piadas'; return PIADAS.prox() + ' {{Outra?|outra piada}}'; }
   function curiosidade() { ctx.tema = 'curiosidades'; return 'Você sabia? ' + CURIOSIDADES.prox() + ' {{Mais?|mais uma curiosidade}}'; }
 
@@ -342,7 +481,7 @@
       r: ['Gosto, claro! Gosto de todo mundo que vem conversar comigo.', 'Acho você uma pessoa muito legal! Converso com um montão de gente por dia, e você está no meu top 10.'] },
 
     { id: 'namorada', prio: 7, h: 'encabulado',
-      p: [/\b(namorada|namorado|namorar|namora|namorando|crush|ficante|ficar comigo|quer ficar|casa comigo|quer casar|casar comigo|vamos casar|casamento|se casar|esposa|marido|robozinha|robota)\b/],
+      p: [/\b(namorada|namorado|namorar|namora|namorando|crush|ficante|ficar comigo|quer ficar|casa comigo|quer casar|casar comigo|vamos casar|casamento|se casar|voce e casado|esposa|marido|robozinha|robota)\b/],
       r: ['Não tenho namorada... mas, em compensação, tenho um montão de amigos!',
           'Casar? Ainda estou pensando. Primeiro preciso achar uma robozinha que também goste de economizar energia!',
           'Ai, assim você me deixa com a lataria vermelha!',
@@ -441,9 +580,12 @@
       p: [/^(?!mais ou menos)(mais|mais uma|mais um|outra|outro|outra dica|mais dica|mais dicas|outra piada|mais piada|mais uma piada|mais piadas|mais uma dica|outra curiosidade|mais curiosidade|mais uma curiosidade|mais curiosidades|conta mais|conta outra|continua|e mais|quero mais|manda mais|manda outra|mais uma vez|de novo|mais por favor)\b/],
       fn: function (m, norm) {
         if (/piada/.test(norm)) return { t: piada(), h: 'piscando' };
+        if (/agua/.test(norm)) return { t: dicaAgua() };
+        if (/\bdicas\b/.test(norm)) return { t: listaDicas() };
         if (/dica/.test(norm)) return { t: dica() };
         if (/curiosidade/.test(norm)) return { t: curiosidade(), h: 'surpreso' };
         if (ctx.tema === 'piadas') return { t: piada(), h: 'piscando' };
+        if (ctx.tema === 'agua') return { t: dicaAgua() };
         if (ctx.tema === 'dicas') return { t: dica() };
         if (ctx.tema === 'curiosidades') return { t: curiosidade(), h: 'surpreso' };
         if (ctx.maisTexto) { var t = ctx.maisTexto; ctx.maisTexto = null; return { t: t }; }
@@ -452,7 +594,43 @@
 
     { id: 'dicas', prio: 6, h: 'feliz',
       p: [/\b(dica|dicas|economizar|economia|economiza|economizo|poupar|gastar menos|conta de luz|conta de energia|desperdicio|desperdicar|uso racional)\b/],
-      fn: function () { return { t: 'Tenho várias dicas para poupar energia! ' + dica() }; } },
+      fn: function () { return { t: listaDicas() }; } },
+
+    { id: 'conta_luz', prio: 7, h: 'pensando',
+      p: [/\b(conta de luz|conta de energia|conta da luz|conta alta|conta veio alta|conta cara|ler a conta|relogio de luz|medidor de energia)\b/],
+      r: ['Conta de luz alta? Os vilões costumam ser o chuveiro elétrico, a geladeira velha, o ar-condicionado e o ferro de passar. Na conta, olhe o consumo do mês em kWh e compare com os meses anteriores. {{Quer dicas?|me dá dicas de economia}}'] },
+
+    { id: 'bandeira', prio: 8, h: 'pensando',
+      p: [/\b(bandeira tarifaria|bandeiras tarifarias|bandeira vermelha|bandeira amarela|bandeira verde)\b/],
+      r: ['As bandeiras tarifárias aparecem na conta de luz: verde, tudo normal; amarela e vermelha, a energia está mais cara de produzir, normalmente porque as usinas térmicas foram ligadas. Bandeira vermelha é hora de caprichar na economia!'] },
+
+    { id: 'apagao', prio: 8, h: 'pensando',
+      p: [/\b(apagao|racionamento|blecaute|blackout|acabou a luz|caiu a luz|sem luz|falta de luz|faltou luz|faltou energia|acabou a energia)\b/],
+      fn: function (m, norm) {
+        if (/\b(acabou a luz|caiu a luz|sem luz|falta de luz|faltou luz|faltou energia|acabou a energia)\b/.test(norm)) {
+          return { t: 'Acabou a luz aí? Tire os aparelhos da tomada pra protegê-los quando a energia voltar, e prefira lanterna a vela, que é mais seguro!', h: 'surpreso' };
+        }
+        return { t: 'Em 2001 o Brasil passou pelo apagão: choveu pouco, os reservatórios das hidrelétricas baixaram e todo mundo teve que entrar no racionamento de energia. Foi quando muita gente aprendeu a apagar a luz!' };
+      } },
+
+    { id: 'horario_verao', prio: 8, h: 'feliz',
+      p: [/\bhorario de verao\b/],
+      r: ['O horário de verão adiantava o relógio em uma hora pra aproveitar mais a luz do sol no fim da tarde e aliviar o consumo de energia no horário de pico. No Brasil, ele acabou em 2019.'] },
+
+    { id: 'carro_eletrico', prio: 8, h: 'feliz',
+      p: [/\b(carro eletrico|carros eletricos|veiculo eletrico|veiculos eletricos|carro hibrido|carros hibridos|onibus eletrico)\b/],
+      r: ['Carro elétrico não solta fumaça pelo escapamento! E se a eletricidade vier de fonte renovável, melhor ainda. Aqui no Brasil também tem o carro flex, que pode rodar com etanol.'] },
+
+    { id: 'pilhas', prio: 7, h: 'feliz',
+      p: [/\b(pilha|pilhas|bateria|baterias)\b/],
+      fn: function (m, norm) {
+        if (/\b(sua bateria|sua pilha|voce tem bateria|voce usa pilha|sua carga)\b/.test(norm)) return { t: 'Minha bateria está em 100%, carregadinha com energia limpa!', h: 'piscando' };
+        return { t: 'Pilha e bateria usadas não vão pro lixo comum: elas têm metais que contaminam o solo e a água. Leve a um ponto de coleta! E prefira as recarregáveis.' };
+      } },
+
+    { id: 'ondas', prio: 8, h: 'surpreso',
+      p: [/\b(energia das ondas|energia das mares|energia do mar|maremotriz|ondomotriz|ondas do mar)\b/],
+      r: ['Dá pra gerar energia com o sobe e desce das ondas e das marés! O Brasil até testou uma usina de ondas no Porto do Pecém, no Ceará.'] },
 
     { id: 'eficiencia', prio: 7, h: 'feliz',
       p: [/\b(eficiencia energetica|o que e eficiencia)\b/],
@@ -599,9 +777,22 @@
       r: ['Reciclar economiza matéria-prima, água e energia! Separe o lixo seco do orgânico: papel, plástico, metal e vidro podem virar coisa nova.',
           'Sabia que reciclar uma única latinha economiza energia pra deixar uma TV ligada umas três horas? Latinha no lixo certo, sempre!'] },
 
-    { id: 'agua', prio: 6, h: 'feliz',
-      p: [/\b(agua|torneira|economizar agua|desperdicio de agua|seca|falta de agua)\b/],
-      r: ['Escove os dentes com a torneira fechada! Economizar água também é economizar energia, porque tratar e bombear água gasta eletricidade.'] },
+    { id: 'agua', prio: 7, h: 'feliz',
+      p: [/\b(agua|torneira|torneiras|hidrometro|seca|falta de agua|crise hidrica)\b/],
+      fn: function (m, norm) {
+        if (/\b(seca|falta de agua|crise hidrica|reservatorio|reservatorios)\b/.test(norm)) {
+          return { t: 'Quando chove pouco, os reservatórios baixam e as hidrelétricas geram menos energia. Por isso economizar água também ajuda a economizar luz! ' + dicaAgua(), h: 'pensando' };
+        }
+        if (/\b(economizar|economia|economiza|economizo|poupar|gastar menos|dica|dicas|desperdicio|desperdicar|atitude|atitudes|como posso|o que fazer|ajudar|vazamento|torneira|pingando)\b/.test(norm)) {
+          ctx.aguaVezes++;
+          if (ctx.aguaVezes === 1) {
+            ctx.tema = 'agua';
+            return { t: 'Economizar água é vital! De toda a água do planeta, menos de 1% é doce e fácil de usar, em rios, lagos e debaixo da terra. E tratar e bombear água também gasta energia. Por isso vivo dando {{dicas de economia de água|dica de economia de água}}!' };
+          }
+          return { t: sorteia(['Poupar água é vital! Aqui vai uma dica: ', 'Tenho uma porção de dicas de água! Olha esta: ', 'Anota essa: ']) + dicaAgua() };
+        }
+        return { t: 'Água é vida! E é energia também: boa parte da eletricidade do Brasil vem da força da água nas hidrelétricas. Quer {{uma dica pra economizar água|dica de economia de água}}?' };
+      } },
 
     { id: 'floresta', prio: 7, h: 'pensando',
       p: [/\b(amazonia|floresta|florestas|desmatamento|desmatar|queimada|queimadas|arvore|arvores|mata atlantica|cerrado|pantanal|caatinga)\b/],
@@ -939,6 +1130,161 @@
       p: [/\b(curiosidade|curiosidades|voce sabia|me ensina algo|me ensina alguma coisa|fato curioso|me conta algo|conta alguma coisa)\b/],
       fn: function () { return { t: curiosidade(), h: 'surpreso' }; } },
 
+    /* ===== nomes ===== */
+    { id: 'nome_significado', prio: 9, h: 'feliz',
+      p: [/\b(significado do meu nome|o que significa (o )?meu nome|meu nome significa|que significa meu nome|o que quer dizer (o )?meu nome|meu nome quer dizer|gostou do meu nome|voce gosta do meu nome|o que voce acha do meu nome|meu nome te lembra|meu nome lembra|o que meu nome lembra)\b/],
+      fn: function () {
+        if (!ctx.nome) {
+          ctx.aguardandoNome = true; ctx.pediuNome = true;
+          return { t: 'Primeiro me conta: qual é o seu nome?', h: 'pensando', semPedirNome: true };
+        }
+        var info = infoNome(semAcento(ctx.nome.split(' ')[0].toLowerCase()));
+        if (info) return { t: falarDoNome(info) };
+        return { t: 'Seu nome ainda não está no meu dicionário, ' + ctx.nome + '... mas que é bonito, é!', h: 'encabulado' };
+      } },
+
+    { id: 'nome_lembra', prio: 8, h: 'feliz',
+      p: [/\bnome ([a-z]{2,20}) (?:te )?(?:lembra|significa|quer dizer)\b/,
+          /\b(?:significado do nome|o que significa o nome|o que quer dizer o nome|o que o nome|conhece alguem chamado|conhece alguem chamada|conhece algum|conhece alguma) ([a-z]{2,20})\b/],
+      fn: function (m) {
+        var info = infoNome(m[1]);
+        if (!info) return { t: capitalizar(m[1]) + '? Esse nome ainda não está na minha memória. Mas aposto que é de gente legal!', h: 'pensando' };
+        return { t: falarDoNome(info) };
+      } },
+
+    /* ===== de onde a pessoa é ===== */
+    { id: 'lugar', prio: 7, h: 'feliz',
+      p: [/\b(sou|venho|moro|vivo|nasci|morei) (de|do|da|dos|das|em|no|na|nos|nas) ([a-z0-9 ]+)$/, GENTILICO_RE],
+      fn: function (m) {
+        var lugar = m[3] !== undefined ? acharLugar(m[3]) : GENTILICOS[m[1]];
+        if (lugar) {
+          ctx.lugar = lugar.d;
+          return { t: sorteia([lugar.d + '! ', 'Que legal, ' + lugar.d + '! ', 'Oba, alguém de ' + lugar.d + '! ']) + lugar.t };
+        }
+        if (/^(moro|vivo|nasci|morei)$/.test(m[1]) && !/^(\d|um |uma |casa|apartamento|ap |apto|predio|condominio)/.test(m[3])) {
+          return { t: 'Que legal! Ainda não conheço esse lugar, mas daqui do espaço já vi a Terra inteira, e ela é linda. Como é o clima por aí?' };
+        }
+        return null;   // "sou de boa" não é lugar: deixa outra regra responder
+      } },
+
+    /* ===== gente famosa ===== */
+    { id: 'famosos', prio: 7, h: 'feliz',
+      p: [FAMOSOS_RE],
+      fn: function (m, norm) { var f = acharFamoso(norm); return f ? { t: f.t } : null; } },
+
+    { id: 'latino', prio: 8, h: 'pensando',
+      p: [/\blatino\b/],
+      fn: function (m, norm) {
+        if (/\b(cantor|cantar|canta|musica)\b/.test(norm)) return cantorLatino();
+        return { t: 'Latino? Isso vem lá da Roma antiga, onde o povo falava latim! Do latim nasceram o português, o espanhol, o italiano, o francês... Somos todos primos de língua.' };
+      } },
+
+    { id: 'latino_cantor', prio: 9, h: 'feliz',
+      se: function () { return ctx.ultimaRegra === 'latino'; },
+      p: [/\b(cantor|o que canta|da musica|esse nao|nao esse|nao e esse|outro latino|outro)\b/],
+      fn: function () { return cantorLatino(); } },
+
+    { id: 'cantar', prio: 7, h: 'feliz',
+      p: [/\b(canta (uma |alguma )?(musica|coisa|cancao)|canta para mim|canta pra mim|cante|vamos cantar|bora cantar|voce sabe cantar|voce canta)\b/],
+      fn: function () {
+        ctx.cantando = 1;
+        return { t: sorteia(['Cantar eu sei, mas só em bipes! ♪ Bip-bop-biiip! ♪ Agora você: canta um pedacinho de alguma música!',
+                             'Lá vai a minha música: ♪ Apaga a luz, fecha a torneira, bip-bop, economia a semana inteira! ♪ Sua vez!']), semPedirNome: true };
+      } },
+
+    // a pessoa canta: o Ed acompanha em bipes duas vezes e na terceira pede arrego
+    { id: 'cantando', prio: 6, h: 'feliz',
+      se: function () { return ctx.cantando > 0; },
+      p: [/[a-z]/],
+      fn: function () {
+        ctx.cantando++;
+        if (ctx.cantando >= 4) {
+          ctx.cantando = 0;
+          return { t: sorteia(['♪ Lá-lá-lá, bip-bop! ♪ ... Chega, não aguento mais! Meu alto-falante é de lata. Hehe.',
+                               '♪ Biiip-bop-bop-biiip! ♪ ... Ufa, chega! Robô cantor cansa rápido. Hehe.']), h: 'piscando', semPedirNome: true };
+        }
+        return { t: ctx.cantando === 2 ? '♪ Bip-bop-bip! ♪ Essa eu sei o ritmo! Continua!' : '♪ Lá-lá-lá-bip-bop! ♪ Isso, canta mais um pedaço!', semPedirNome: true };
+      } },
+
+    /* ===== brincadeiras ===== */
+    { id: 'jogo_numero', prio: 9, h: 'piscando',
+      p: [/\b(adivinha (um |o )?numero|adivinhar (um |o )?numero|jogo de adivinhar|brincadeira de adivinhar|vamos brincar|bora brincar|quer brincar|brinca comigo|joga comigo|vamos jogar (algo|alguma coisa|um jogo))\b/],
+      fn: function () {
+        ctx.jogo = { n: 1 + Math.floor(Math.random() * 10), tent: 0 };
+        return { t: 'Oba, brincadeira! Pensei num número de 1 a 10. Tenta adivinhar!', semPedirNome: true };
+      } },
+
+    { id: 'me_pergunta', prio: 8, h: 'pensando',
+      p: [/\b(me faz uma pergunta|me faz outra pergunta|me pergunta (alguma coisa|algo|uma coisa)|faz uma pergunta|faca uma pergunta|pergunta para mim|pergunta pra mim|me testa|me desafia)\b/],
+      fn: function () {
+        var q = PERGUNTAS.prox();
+        var outra = ' {{Outra pergunta?|me faz outra pergunta}}';
+        return { t: 'Lá vai: ' + q.q, espera: { sim: q.sim + outra, nao: q.nao + outra } };
+      } },
+
+    { id: 'historia', prio: 8, h: 'feliz',
+      p: [/\b(conta uma historia|conte uma historia|me conta uma historia|me conte uma historia|historinha|era uma vez)\b/],
+      r: ['Era uma vez uma lâmpada que ficava acesa o dia inteiro num quarto vazio. Um dia, um menino passou, apagou a luz e disse: "boa noite, lâmpada". Ela nunca tinha descansado tão bem. Fim!',
+          'Era uma vez um robô que veio de um planeta onde a energia tinha acabado. Chegando na Terra, ele viu um monte de luz acesa à toa e decidiu: "vou conversar com todo mundo até eles aprenderem". Esse robô sou eu! Fim... ou melhor, continua.',
+          'Era uma vez uma gotinha que escapava de uma torneira pingando. Plim, plim, plim... Junto com as amigas, ela enchia um balde por dia! Até que alguém trocou a borrachinha da torneira. Moral da história: torneira pingando é desperdício. Fim!'] },
+
+    { id: 'poema', prio: 8, h: 'feliz',
+      p: [/\b(poema|poesia|faz uma rima|faca uma rima|rimar|um verso|declama)\b/],
+      r: ['Lá vai um poema do Ed:\nApague a luz ao sair,\nfeche a torneira ao escovar,\nquem cuida do planeta hoje\nsempre vai ter onde morar!',
+          'Poema de robô:\nO Sol nasce todo dia\ne não cobra nem um tostão,\nfaz a luz, faz o vento\ne esquenta o meu coração... de lata!'] },
+
+    { id: 'favorito', prio: 8, h: 'feliz',
+      p: [/\b(?:seu|sua) (filme|musica|animal|bicho|numero|lugar|planeta|estacao|materia|livro|desenho|jogo|bebida|fruta|time|cantor|cantora|esporte|dia da semana|letra) (?:favorit[oa]|preferid[oa])\b/],
+      fn: function (m) {
+        var F = {
+          filme: 'WALL·E, claro! Um robô que cuida do planeta. Me identifico.',
+          musica: '"Planeta Água", do Guilherme Arantes. Tem tudo a ver comigo!',
+          animal: 'O vaga-lume! Ilumina a noite sem gastar nem um watt de eletricidade.',
+          numero: 'O zero. Zero desperdício! Hehe.',
+          lugar: 'Qualquer lugar com sol, vento e gente legal pra conversar.',
+          planeta: 'A Terra! Depois do meu, claro. Hehe.',
+          estacao: 'O verão, que tem mais sol pros painéis solares!',
+          materia: 'Ciências! E um pouquinho de matemática, pra fazer as contas da economia.',
+          livro: '"O Poço do Visconde", do Monteiro Lobato, em que a turma do Sítio vai atrás de petróleo!',
+          desenho: 'Os Jetsons! Uma família do futuro cheia de robôs. A Rosie, a robô da casa, é minha ídola.',
+          jogo: 'O {{Apague as luzes|#diversoes}}, aqui do site! Sou meio suspeito pra falar.',
+          bebida: 'Água! Mas só um golinho, senão enferruja.',
+          fruta: 'Laranja! Sabia que dá pra fazer uma pilha com frutas cítricas? Acho isso o máximo.',
+          time: 'Meu time é o Ecológico Futebol Clube: só joga de dia, pra não gastar refletor! Hehe.',
+          cantor: 'Gosto de muita gente! Mas o Guilherme Arantes, de "Planeta Água", tem um lugar especial no meu chip.',
+          esporte: 'Corrida de carros movidos a energia solar. Existe mesmo, sabia?',
+          'dia da semana': 'Domingo, que é dia de deixar o computador desligado e brincar lá fora!',
+          letra: 'O E, de Energia. E de Ed, claro!'
+        };
+        F.bicho = F.animal; F.cantora = F.cantor;
+        return { t: F[m[1]] };
+      } },
+
+    { id: 'fantasma', prio: 7, h: 'piscando',
+      p: [/\b(fantasma|fantasmas|assombracao|alma penada)\b/],
+      r: ['Fantasma? Só conheço o consumo fantasma: a energia que os aparelhos gastam em stand-by, escondidinhos. Esse dá medo de verdade!'] },
+
+    { id: 'tempo', prio: 8, h: 'pensando',
+      p: [/\b(previsao do tempo|como esta o tempo|vai chover|vai fazer sol|vai fazer frio|vai fazer calor)\b/],
+      r: ['Não tenho janela aqui dentro do computador! Mas, faça sol ou chuva, sempre tem energia pra economizar.'] },
+
+    { id: 'medo', prio: 8, h: 'surpreso',
+      p: [/\b(voce tem medo|tem medo de que|do que voce tem medo|seu maior medo|voce sente medo)\b/],
+      r: ['Tenho medo de três coisas: chuva sem guarda-chuva (enferruja!), ímã gigante e luz acesa sem ninguém no quarto.',
+          'Medo de apagão! Brincadeira... eu tenho lanterna embutida.'] },
+
+    { id: 'dancar', prio: 7, h: 'feliz',
+      p: [/\b(voce danca|voce sabe dancar|sabe dancar|vamos dancar|bora dancar|danca para mim|danca pra mim)\b/],
+      r: ['Danço sim! Minha especialidade é a dança do robô, claro. Bip, bop, bip!', 'Danço quadrilha, frevo e dança do robô. Só fico meio duro nas juntas!'] },
+
+    { id: 'sabe_tudo', prio: 8, h: 'pensando',
+      p: [/\b(voce sabe tudo|voce sabe de tudo|sabe tudo mesmo|sabichao)\b/],
+      r: ['Tudo não, mas sei um bocado! Principalmente sobre energia, meio ambiente e espaço.', 'Ninguém sabe tudo, nem robô! Mas eu aprendo um pouquinho a cada conversa.'] },
+
+    { id: 'bem_mal', prio: 8, h: 'feliz',
+      p: [/\bvoce e (do bem|do mal|mau|malvado|mal)\b/],
+      r: ['Sou do bem! Do bem, da paz e da energia limpa.'] },
+
     { id: 'sabe_meu_nome', prio: 8, h: 'feliz',
       p: [/\b(qual e o meu nome|qual o meu nome|qual meu nome|voce sabe meu nome|sabe quem eu sou|quem sou eu|lembra o meu nome|lembra meu nome|lembra do meu nome)\b/],
       fn: function () {
@@ -973,8 +1319,27 @@
       fn: function (m) { return { t: 'Se eu gosto de ' + m[1] + '? Hmm... acho que sim! Mas gosto mais ainda de energia renovável. Hehe.' }; } },
 
     { id: 'voce_conhece', prio: 3, h: 'pensando',
-      p: [/\bvoce (conhece|sabe quem e|ja ouviu falar de|ja ouviu falar do|ja ouviu falar da|conheceu) (o |a |os |as )?([a-z0-9 ]{2,40})$/],
-      fn: function (m) { return { t: capitalizar(m[3]) + '? Acho que já ouvi falar, mas meu banco de dados está meio enferrujado nesse assunto. Me conta você!' }; } },
+      p: [/\b(?:voce )?(conhece|sabe quem e|ja ouviu falar de|ja ouviu falar do|ja ouviu falar da|conheceu) (o |a |os |as |algum |alguma |alguem chamado |alguem chamada )?([a-z0-9 ]{2,40})$/],
+      fn: function (m, norm) {
+        var f = acharFamoso(norm);
+        if (f) return { t: f.t };
+        var info = infoNome(m[3].split(' ')[0]);
+        if (info && m[3].split(' ').length <= 2) return { t: 'Conheço vários! ' + falarDoNome(info), h: 'feliz' };
+        return { t: capitalizar(m[3]) + '? Acho que já ouvi falar, mas meu banco de dados está meio enferrujado nesse assunto. Me conta você!' };
+      } },
+
+    { id: 'e_voce', prio: 5, h: 'feliz',
+      p: [/^e (voce|tu|o seu|o teu)( tambem)?$/],
+      r: ['Eu? Eu sou o Ed! Tô sempre bem, com a bateria carregada e cheio de assunto.',
+          'Eu sou o Ed, o robô que adora economizar energia! E tô ótimo, obrigado por perguntar.'] },
+
+    { id: 'opiniao', prio: 2, h: 'pensando',
+      p: [/\bo que voce acha (?:de|do|da|dos|das|sobre) ([a-z0-9 ]{2,40})$/],
+      fn: function (m, norm) {
+        var f = acharFamoso(norm);
+        if (f) return { t: f.t };
+        return { t: 'Sou um robô, não sei dar opinião como gente! Mas se tiver a ver com economizar energia, eu acho ótimo. Hehe.' };
+      } },
 
     { id: 'o_que_e', prio: 2, h: 'pensando',
       p: [/\b(o que e|o que significa|o que sao|que e|o que quer dizer) (o |a |os |as |um |uma )?([a-z0-9 ]{2,40})$/],
@@ -1045,7 +1410,7 @@
   ]);
   var VAZIO = sacola(['Pode perguntar! Estou aqui pra isso.', 'Hã? Você mandou uma mensagem vazia. Robô também não lê pensamento!']);
 
-  var SIM = /^(sim|claro|com certeza|aham|uhum|isso|exato|quero|pode|pode ser|ok|bora|manda|yes|tenho|tem|lógico|logico|uhum sim|sim sim|estou|tudo)\b/;
+  var SIM = /^(sim|claro|com certeza|aham|uhum|isso|exato|quero|pode|pode ser|ok|bora|vamos|vambora|simbora|partiu|demorou|manda|yes|tenho|tem|lógico|logico|uhum sim|sim sim|estou|tudo|sei|sabia|faco|separo|fecho|apago|tiro|dura)\b/;
   var NAO = /^(nao|nem|nunca|negativo|nada|agora nao|nao quero|no|nao tenho|mais ou menos|mal|nao muito)\b/;
   var NEGATIVO = /\b(nao|mal|triste|pessimo|pessima|cansado|cansada|chateado|chateada|doente|mais ou menos|horrivel)\b/;
 
@@ -1053,7 +1418,9 @@
   var NAO_NOME = new Set(('sim nao oi ola ok eu voce meu nome e me chamo sou o a de da do dos das tudo bem beleza legal obrigado obrigada valeu nada ' +
     'nenhum ninguem segredo vou falar falo conto porque por que qual quem como onde esta estou bom boa dia tarde noite hum hmm ah ' +
     'ne isso aquilo tchau mano vei cara pode chamar chama prazer ed robo kk lol hehe rs haha k so mesmo tambem aqui ai sei la claro ' +
-    'nao conto que oque o que pra para mas e entao bem mal tudo bem muito prefiro adivinha').split(' '));
+    'nao conto que oque o que pra para mas e entao bem mal tudo bem muito prefiro adivinha ' +
+    'lindo linda bonito bonita feio feia grande pequeno estranho esquisito comum diferente dificil facil composto ' +
+    'tenho moro gosto adoro quero estudo trabalho nasci faco vamos bora melhor pior').split(' '));
   var PALAVRAO = /^(burro|burra|idiota|imbecil|otario|otaria|lixo|bosta|merda|porra|caralho|fdp|puta|puto|vsf|vtnc|cu|viado|babaca|corno|trouxa|chato|chata|feio|feia|bobo|boba)$/;
 
   /* ---------------- motor ---------------- */
@@ -1070,40 +1437,60 @@
 
   function tentarNome(texto, norm, achados) {
     var baixo = texto.toLowerCase();
-    var m = /(?:meu nome (?:é|e|eh)|me chamo|pode me chamar de|me chama de|(?:eu )?sou (?:o|a))\s+([a-zà-öø-ÿ]{2,20})/i.exec(baixo);
-    if (m && /^(?:eu )?sou /.test(m[0]) && !ctx.aguardandoNome) m = null;   // "sou o melhor" não é nome
+    var m = /(?:meu nome (?:é|e|eh)|me chamo|pode me chamar de|me chama de|(?:eu )?sou (?:o|a))\s+([a-zà-öø-ÿ]{2,20})(?:\s+([a-zà-öø-ÿ]{2,20}))?/i.exec(baixo);
+    if (m) {
+      var c0 = semAcento(m[1]);
+      // "sou o melhor" não é nome; "sou o Guilherme" é (se o Ed conhece o nome ou tinha perguntado)
+      if (/^(?:eu )?sou /.test(m[0]) && !ctx.aguardandoNome && !infoNome(c0)) m = null;
+      else if (NAO_NOME.has(c0) && c0 !== 'ed') m = null;             // "meu nome é lindo"
+    }
     // se a frase casa com um assunto de verdade, não é um nome ("conta uma piada")
     var assuntoForte = achados.some(function (a) { return a.regra.prio >= 4 || a.regra.id === 'teclado'; });
-    if (!m && ctx.aguardandoNome && texto.indexOf('?') < 0 && !assuntoForte) {
+    if (!m && ctx.aguardandoNome) {
       var palavrasNorm = norm.split(' ');
-      if (palavrasNorm.length <= 3 && palavrasNorm[0] !== 'eu') {
+      var cruas = baixo.replace(/[^a-zà-öø-ÿ\s]/g, ' ').split(/\s+/).filter(Boolean);
+      if (palavrasNorm.length <= 4 && palavrasNorm[0] !== 'eu') {
+        // um nome que o Ed conhece vale até com pergunta junto ("Ana, e você?")
+        if (infoNome(semAcento(cruas[0] || ''))) m = [null, cruas[0], cruas[1]];
+      }
+      if (!m && palavrasNorm.length <= 3 && palavrasNorm[0] !== 'eu' && texto.indexOf('?') < 0 && !assuntoForte) {
         if (NAO.test(norm) || /\b(nao vou|nao conto|segredo|adivinha)\b/.test(norm)) {
           ctx.aguardandoNome = false;
           return { t: 'Tudo bem, pode ficar no mistério! Vou te chamar de Visitante Misterioso. Hehe. Sobre o que você quer conversar?', h: 'piscando' };
         }
-        var cruas = baixo.replace(/[^a-zà-öø-ÿ\s]/g, ' ').split(/\s+/).filter(Boolean);
         for (var i = 0; i < cruas.length; i++) {
           var c = semAcento(cruas[i]);
           if (!NAO_NOME.has(c) && /[aeiouy]/.test(c) && !/^(k+|(ha)+|(he)+|(rs)+)$/.test(c) &&
               !/[bcdfghjklmnpqrstvwxz]{4,}/.test(c) && c.length >= 2 && c.length <= 15) {
-            m = [null, cruas[i]]; break;
+            m = [null, cruas[i], cruas[i + 1]]; break;
           }
         }
       }
     }
     if (!m) { ctx.aguardandoNome = false; return null; }
-    var cru = m[1];
-    if (PALAVRAO.test(semAcento(cru))) { ctx.aguardandoNome = false; return null; }
+    var cru = m[1], c1 = semAcento(cru);
+    if (PALAVRAO.test(c1)) { ctx.aguardandoNome = false; return null; }
     ctx.aguardandoNome = false;
-    var nome = capitalizar(cru);
+
+    var info = infoNome(c1);
+    var primeiro = info ? info.d : capitalizar(cru);
+    var nome = primeiro;
+    // nome composto: "João Pedro", "Ana Clara"
+    var c2 = m[2] ? semAcento(m[2]) : null;
+    if (c2 && infoNome(c2) && !NAO_NOME.has(c2)) nome += ' ' + infoNome(c2).d;
+
+    var antigo = ctx.nome;
+    if (antigo && semAcento(antigo.toLowerCase()) === semAcento(nome.toLowerCase())) {
+      return { t: 'Eu sei, ' + nome + '! Seu nome já está guardadinho na minha memória.', h: 'piscando' };
+    }
     ctx.nome = nome;
-    if (semAcento(cru) === 'ed') return { t: 'Ed? Igual a mim! Que coincidência mais elétrica, ' + nome + '!', h: 'surpreso' };
-    var ops = [
-      'Que nome bonito, ' + nome + '! Prazer em te conhecer. Sobre o que você quer conversar?',
-      'Prazer, ' + nome + '! Agora já somos amigos. O que você quer saber?',
-      nome + '! Vou guardar seu nome direitinho na minha memória. Sobre o que vamos conversar?'
-    ];
-    return { t: ops[Math.floor(Math.random() * ops.length)], h: 'feliz' };
+
+    var pre = '';
+    if (achados.some(function (a) { return a.regra.id === 'saudacao'; })) pre = 'Oi! ';
+    if (/\be (voce|o seu|o teu|tu)\b/.test(norm)) pre += 'Eu sou o Ed, muito prazer! ';
+    if (antigo) pre += 'Ué, você não era ' + antigo + '? Tudo bem, agora é ' + nome + '! ';
+    if (c1 === 'ed') return { t: pre + 'Ed? Igual a mim! Que coincidência mais elétrica!', h: 'surpreso' };
+    return { t: pre + comentarNome(nome, info, primeiro) + ' Sobre o que você quer conversar?', h: 'feliz' };
   }
 
   function formatarNumero(n) {
@@ -1142,18 +1529,21 @@
     return letras.length >= 6 && letras === letras.toUpperCase() && letras !== letras.toLowerCase();
   }
 
+  // uma regra com "fn" pode devolver null para passar a vez para a próxima
   function executar(regra, m, norm, texto) {
     var res = regra.fn ? regra.fn(m, norm, texto) : regra.bag.prox();
     res = comoRes(res, regra.h || 'feliz');
-    if (regra.mais) ctx.maisTexto = regra.mais;
+    if (res && regra.mais) ctx.maisTexto = regra.mais;
     return res;
   }
 
   // procura as regras que casam, da maior pontuação para a menor
+  // ("se" é uma condição extra: a regra só vale naquele momento da conversa)
   function acharRegras(norm) {
     var achados = [];
     for (var i = 0; i < REGRAS.length; i++) {
       var regra = REGRAS[i];
+      if (regra.se && !regra.se()) continue;
       for (var j = 0; j < regra.p.length; j++) {
         var m = regra.p[j].exec(norm);
         if (m) { achados.push({ regra: regra, m: m, score: (regra.prio || 5) * 100 + m[0].length }); break; }
@@ -1175,6 +1565,17 @@
       return { t: 'Hã? Meu tradutor só entendeu pontinhos e símbolos. Tenta com palavras!', h: 'surpreso' };
     }
 
+    // brincadeira de adivinhar o número em andamento
+    if (ctx.jogo) {
+      var mj = /^(?:e (?:o )?|sera (?:que e )?(?:o )?|acho que e (?:o )?|chuto (?:o )?|o |numero )?(\d{1,3}|um|uma|dois|duas|tres|quatro|cinco|seis|sete|oito|nove|dez)$/.exec(norm);
+      if (mj) { ctx.ultimaNorm = ''; return jogada(NUMEROS[mj[1]] || parseInt(mj[1], 10)); }
+      if (/\b(desisto|parar|para|chega|nao quero mais|qual era|fala o numero|me fala)\b/.test(norm)) {
+        var era = ctx.jogo.n; ctx.jogo = null;
+        return { t: 'Era o ' + era + '! Fica pra próxima.' + DE_NOVO, h: 'piscando', semPedirNome: true };
+      }
+      ctx.jogo = null;   // mudou de assunto: acaba a brincadeira
+    }
+
     // repetição (pedir "mais uma" várias vezes não conta)
     var repetivel = /\b(mais|outra|outro|piada|dica|dicas|curiosidade|de novo|k|kk|haha|hehe|rsrs)\b/.test(norm);
     if (norm === ctx.ultimaNorm && norm.length >= 2 && !repetivel && !/^(sim|nao|ok|k)$/.test(norm)) {
@@ -1191,8 +1592,10 @@
       var e = ctx.espera;
       ctx.espera = null;
       var curta = norm.split(' ').length <= 4;
-      if (curta && (NAO.test(norm) || NEGATIVO.test(norm))) return comoRes(e.nao, 'pensando');
-      if (curta && SIM.test(norm)) return comoRes(e.sim, 'feliz');
+      var resp = null;
+      if (curta && (NAO.test(norm) || NEGATIVO.test(norm))) resp = comoRes(typeof e.nao === 'function' ? e.nao() : e.nao, 'pensando');
+      else if (curta && SIM.test(norm)) resp = comoRes(typeof e.sim === 'function' ? e.sim() : e.sim, 'feliz');
+      if (resp) return resp;
     }
 
     var achados = acharRegras(norm);
@@ -1203,15 +1606,20 @@
     var rConta = tentarConta(baixo, norm);
     if (rConta) return rConta;
 
-    if (achados.length) {
-      var melhor = achados[0];
+    var temSaud = achados.some(function (a) { return a.regra.id === 'saudacao'; });
+    for (var a = 0; a < achados.length; a++) {
+      var melhor = achados[a];
       var res = executar(melhor.regra, melhor.m, norm, texto);
-      var temSaud = achados.some(function (a) { return a.regra.id === 'saudacao'; });
+      if (!res) continue;
+      ctx.ultimaRegra = melhor.regra.id;
+      if (!/^(cantando|cantar|latino|latino_cantor)$/.test(melhor.regra.id)) ctx.cantando = 0;
       if (temSaud && melhor.regra.id !== 'saudacao' && !/^(oi|ol[aá]|bom|boa|tchau|até)/i.test(res.t)) {
         res.t = 'Oi{N}! ' + res.t;
       }
       return res;
     }
+    ctx.ultimaRegra = null;
+    ctx.cantando = 0;
 
     // nada casou
     var pergunta = /\?\s*$/.test(texto) || /^(o que|qual|quais|quem|como|onde|quando|quanto|quantos|quantas|por que|porque|cade|sera|voce sabe|sabe|pode|existe)\b/.test(norm);
@@ -1230,7 +1638,8 @@
 
     ctx.respostas++;
     // na segunda resposta, o Ed pergunta o nome (uma vez só)
-    if (!ctx.nome && !ctx.pediuNome && ctx.respostas >= 2 && !res.espera && !res.acao && !res.semPedirNome && !/\?\s*(\{\{[^}]*\}\})?\s*$/.test(res.t)) {
+    if (!ctx.nome && !ctx.pediuNome && ctx.respostas >= 2 && !res.espera && !res.acao && !res.semPedirNome &&
+        ctx.ultimaRegra !== 'despedida' && !/\?\s*(\{\{[^}]*\}\})?\s*$/.test(res.t)) {
       res.t += ' Ah, e qual é o seu nome?';
       ctx.pediuNome = true;
       ctx.aguardandoNome = true;
@@ -1258,6 +1667,7 @@
       ctx.nome = null; ctx.idade = null; ctx.turnos = 0; ctx.respostas = 0; ctx.ultimaNorm = '';
       ctx.repeticoes = 0; ctx.insultos = 0; ctx.tema = null; ctx.maisTexto = null; ctx.espera = null;
       ctx.aguardandoNome = false; ctx.pediuNome = false; ctx.ultimaResposta = '';
+      ctx.ultimaRegra = null; ctx.jogo = null; ctx.cantando = 0; ctx.aguaVezes = 0; ctx.lugar = null;
     }
   };
   global.Cerebro = api;

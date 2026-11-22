@@ -294,6 +294,13 @@
       });
     }
 
+    // favicon: a foto do Ed (a primeira da InBot é quase quadrada).
+    // Se não carregar, fica o desenho que está no index.html.
+    carregar(FOTOS_INBOT[0]).then(function (src) {
+      var icone = document.querySelector('link[rel="icon"]');
+      if (src && icone) { icone.removeAttribute('type'); icone.href = src; }
+    });
+
     fotosLocais().then(function (locais) {
       if (locais.length) return { lista: locais, credito: '' };
       return fotosInbot().then(function (l) { return { lista: l, credito: ' · InBot' }; });
@@ -310,16 +317,15 @@
   })();
 
   /* ---------------- caras do Ed (Quem sou eu) ---------------- */
+  // um Ed desenhado só pra esta seção, assim o retrato do lado não muda
+  var edCaras = Ed.criar($('#caras-retrato'));
   $('#caras').addEventListener('click', function (e) {
     var b = e.target.closest('button[data-humor]');
     if (!b) return;
-    // as caras só aparecem no desenho; se estiver numa foto, volta pro desenho
-    if (imagens[imgAtual].tipo === 'foto') {
-      for (var k = 0; k < imagens.length; k++) if (imagens[k].tipo === 'desenho') { mostrarImagem(k); break; }
-    }
     var h = b.getAttribute('data-humor');
-    if (h === 'falando') Ed.falar(2600, 'feliz');
-    else { Ed.calar(); Ed.humor(h, 5000); }
+    if (h === 'falando') edCaras.falar(2600, 'feliz');
+    else { edCaras.calar(); edCaras.humor(h, 5000); }
+    $$('#caras button').forEach(function (x) { x.classList.toggle('ativo', x === b); });
     bip('clique');
   });
 
@@ -341,15 +347,53 @@
     location.href = 'mailto:?subject=' + encodeURIComponent('Converse com o Robô Ed!') + '&body=' + encodeURIComponent(corpo);
   });
 
-  /* ---------------- contador de visitas ---------------- */
+  /* ---------------- contador de visitas ----------------
+     Conta de verdade, usando o Abacus (contador gratuito e aberto,
+     sem cadastro). Cada visita conta uma vez por sessão: recarregar a
+     página não aumenta o número. Rodando no seu computador, o contador
+     só lê o total, para os testes não contarem como visita. */
   (function () {
-    var visitas = (parseInt(ler('ed-visitas') || '0', 10) || 0) + 1;
-    guardar('ed-visitas', visitas);
-    var n = String(4382917 + visitas);
-    while (n.length < 9) n = '0' + n;
-    var el = $('#contador');
-    el.setAttribute('aria-label', String(Number(n)));
-    el.innerHTML = n.split('').map(function (d) { return '<span class="digito" aria-hidden="true">' + d + '</span>'; }).join('');
+    var CONTADOR = 'https://abacus.jasoncameron.dev/';
+    var CHAVE = 'roboed-homenagem/visitas';
+    var el = $('#contador'), caixa = el.parentNode;
+    var local = location.protocol === 'file:' || /^(localhost|127\.|\[::1\])/.test(location.hostname);
+
+    function mostrar(v) {
+      var n = String(v);
+      while (n.length < 6) n = '0' + n;
+      el.setAttribute('aria-label', typeof v === 'number' ? String(v) : 'carregando');
+      el.innerHTML = n.split('').map(function (d) { return '<span class="digito" aria-hidden="true">' + d + '</span>'; }).join('');
+      caixa.hidden = false;
+    }
+    function sessao(k, v) {
+      try { if (v === undefined) return sessionStorage.getItem(k); sessionStorage.setItem(k, v); } catch (e) { return null; }
+    }
+
+    var meu = parseInt(sessao('ed-visitante') || '', 10);
+    if (meu > 0) { mostrar(meu); return; }   // já contou nesta sessão
+
+    mostrar('------');   // enquanto carrega
+    var rota = (local ? 'get/' : 'hit/') + CHAVE;
+    var pare = window.AbortController ? new AbortController() : null;
+    var relogio = setTimeout(function () { if (pare) pare.abort(); }, 7000);
+    fetch(CONTADOR + rota, { cache: 'no-store', signal: pare ? pare.signal : undefined })
+      .then(function (r) {
+        if (r.status === 404) return { value: 0 };   // ninguém contou ainda
+        if (!r.ok) throw new Error('contador ' + r.status);
+        return r.json();
+      })
+      .then(function (d) {
+        var v = parseInt(d && d.value, 10);
+        if (!(v >= 0)) throw new Error('contador sem número');
+        if (!local) { sessao('ed-visitante', String(v)); guardar('ed-contador', v); }
+        mostrar(v);
+      })
+      .catch(function () {
+        // sem internet ou serviço fora do ar: mostra o último número visto, se tiver
+        var ultimo = parseInt(ler('ed-contador') || '', 10);
+        if (!local && ultimo > 0) mostrar(ultimo); else caixa.hidden = true;
+      })
+      .then(function () { clearTimeout(relogio); });
   })();
 
   /* =========================================================

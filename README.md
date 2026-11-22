@@ -10,7 +10,13 @@ Este projeto recria o site dele com a estética de internet de antigamente: fund
 
 ## O que tem
 
-- **Converse comigo**: o chat com o Ed. Ele responde sobre energia, meio ambiente, planetas, piadas, Orkut, MSN, 7x1 e muito mais. Também lembra o seu nome, faz contas e reclama se você repetir a mesma pergunta. Se você xingar demais, ele trava.
+- **Converse comigo**: o chat com o Ed. Ele responde sobre energia, água, meio ambiente, planetas, piadas, Orkut, MSN, 7x1 e muito mais. Se você xingar demais, ele trava. Algumas coisas que ele faz:
+  - Comenta o seu nome, igual ao original: "O nome Guilherme me lembra o Guilherme Arantes, que canta *Planeta Água*!" Ele também sabe o que o nome quer dizer.
+  - Conhece os estados do Brasil ("sou de Minas", "sou carioca") e um monte de famosos (Xuxa, Senna, Einstein, Monteiro Lobato...).
+  - Dá dicas de economia em listinha, com o link **Mais?** pra pedir outras, e dicas de água com o link **Outra?**.
+  - Brinca de adivinhar um número, te faz perguntas de sim ou não, conta histórias e faz poemas.
+  - Canta (em bipes) e pede arrego depois de um tempo. Pergunte se ele conhece o Latino!
+  - Lembra o seu nome, faz contas e reclama se você repetir a mesma pergunta.
 - **Quem sou eu**: a ficha técnica do Ed e botões pra ver cada expressão dele.
 - **Diversões**: o joguinho *Apague as luzes!* e um quiz pra descobrir se você é um Guardião da Energia.
 - **Meu blog**: posts do Ed de 2004 a 2016.
@@ -23,7 +29,7 @@ O jeito mais fácil é abrir o link: [guuzribeiro.github.io/roboed](https://guuz
 
 Pra rodar no seu computador, não precisa instalar nada. Baixe o projeto (botão verde **Code → Download ZIP**) e dê dois cliques no `index.html`.
 
-Funciona offline. Só as fontes do Google precisam de internet; sem elas, o site usa fontes do próprio computador.
+Funciona offline. Só as fotos do Ed, as fontes do Google e o contador de visitas precisam de internet; sem elas, o site mostra o desenho do Ed, usa fontes do próprio computador e esconde o contador.
 
 ## Como o "cérebro" funciona
 
@@ -32,9 +38,9 @@ O Ed original não era uma IA como as de hoje, e este também não é. As respos
 1. A mensagem é "limpa": tira acentos e pontuação e entende abreviações como "vc", "pq" e "tbm".
 2. O Ed procura palavras-chave usando regras (expressões regulares) e escolhe a que combina melhor.
 3. As respostas saem de uma "sacola" embaralhada, pra ele não repetir a mesma coisa.
-4. Uma memória curtinha guarda o seu nome e o último assunto.
+4. Uma memória curtinha guarda o seu nome, o último assunto e as brincadeiras em andamento.
 
-Tudo roda no navegador, sem servidor e sem mandar nada pra lugar nenhum.
+A conversa roda toda no navegador, sem servidor: o que você digita não vai pra lugar nenhum.
 
 Quer ensinar coisa nova pro Ed? Abra o `js/cerebro.js` e copie uma das regras. O formato é este:
 
@@ -46,12 +52,29 @@ Quer ensinar coisa nova pro Ed? Abra o `js/cerebro.js` e copie uma das regras. O
 
 `p` são os padrões que disparam a regra, `r` são as respostas possíveis e `h` é a cara que o Ed faz.
 
+### Ensinar nomes, lugares e famosos
+
+O que o Ed sabe sobre nomes fica em [`js/nomes.js`](js/nomes.js). Pra ele comentar um nome novo, copie uma linha:
+
+```js
+pietra: { d: 'Pietra', s: 'pedra', l: ['a Pedra da Gávea, lá no Rio de Janeiro'] },
+```
+
+A chave (`pietra`) é o nome em minúsculas e sem acento, `d` é como se escreve, `s` é o significado e cada item de `l` completa a frase "O nome Pietra me lembra...". Só o `d` é obrigatório. No mesmo arquivo ficam os lugares (com o jeito de chamar quem nasce lá, tipo "mineiro") e os famosos.
+
+## Contador de visitas
+
+O "Você é o visitante nº" do rodapé conta de verdade. Ele usa o [Abacus](https://abacus.jasoncameron.dev), um contador gratuito e aberto que não pede cadastro. Cada pessoa conta uma vez por sessão, então recarregar a página não aumenta o número. Rodando o site no seu computador, ele só mostra o total, sem somar visita.
+
+O Abacus só recebe o pedido de "+1". Ele não fica sabendo nada da conversa.
+
 ## Estrutura
 
 ```
 index.html        a página inteira (todas as seções)
 css/estilo.css    o visual "internet de antigamente"
 js/ed-robo.js     o desenho do Ed em SVG e as expressões dele
+js/nomes.js       o que o Ed sabe sobre nomes, lugares e famosos
 js/cerebro.js     o cérebro: regras, respostas e memória
 js/site.js        liga tudo: chat, menu, jogo, quiz, contador
 fotos/            suas fotos do Ed, opcionais (só no seu computador, veja abaixo)

@@ -195,67 +195,78 @@
 '</svg>';
   }
 
-  var raiz = null, svg = null, cenario = 0, humorAtual = 'feliz';
-  var timerFala = null, timerVolta = null;
+  /* Cada Ed desenhado na página é independente (o do retrato e o das
+     "caras" em Quem sou eu). Os ids do SVG ganham um prefixo próprio
+     para os degradês de um não dependerem do outro. */
+  var contador = 0;
 
-  function montar(el) {
-    raiz = el;
-    el.innerHTML = desenho();
-    svg = el.querySelector('svg');
-  }
+  function criar(el) {
+    var p = 'ed' + (contador++) + '-';
+    el.innerHTML = desenho().replace(/id="/g, 'id="' + p).replace(/url\(#/g, 'url(#' + p);
+    var svg = el.querySelector('svg');
+    var cenario = 0, humorAtual = 'feliz';
+    var timerFala = null, timerVolta = null;
 
-  function humor(h, segurarMs) {
-    if (!svg) return;
-    if (HUMORES.indexOf(h) < 0) h = 'feliz';
-    humorAtual = h;
-    for (var i = 0; i < HUMORES.length; i++) svg.classList.remove('humor-' + HUMORES[i]);
-    svg.classList.add('humor-' + h);
-    clearTimeout(timerVolta);
-    if (h !== 'feliz') {
-      timerVolta = setTimeout(function () { humor('feliz'); }, segurarMs || 7000);
+    function humor(h, segurarMs) {
+      if (HUMORES.indexOf(h) < 0) h = 'feliz';
+      humorAtual = h;
+      for (var i = 0; i < HUMORES.length; i++) svg.classList.remove('humor-' + HUMORES[i]);
+      svg.classList.add('humor-' + h);
+      clearTimeout(timerVolta);
+      if (h !== 'feliz') {
+        timerVolta = setTimeout(function () { humor('feliz'); }, segurarMs || 7000);
+      }
     }
+
+    function falar(ms, humorDurante) {
+      if (humorDurante) humor(humorDurante, ms + 5000);
+      if (humorDurante === 'travado') return; // travado não mexe a boca
+      clearTimeout(timerFala);
+      svg.classList.add('falando');
+      timerFala = setTimeout(function () { svg.classList.remove('falando'); }, ms);
+    }
+
+    function calar() {
+      clearTimeout(timerFala);
+      svg.classList.remove('falando');
+    }
+
+    function aplicarCenario() {
+      var gs = svg.querySelectorAll('.cen');
+      for (var i = 0; i < gs.length; i++) gs[i].style.display = (i === cenario) ? '' : 'none';
+    }
+
+    function irParaCenario(i) {
+      cenario = ((i % CENARIOS.length) + CENARIOS.length) % CENARIOS.length;
+      aplicarCenario();
+      return CENARIOS[cenario];
+    }
+
+    return {
+      humor: humor,
+      falar: falar,
+      calar: calar,
+      irParaCenario: irParaCenario,
+      proximoCenario: function () { return irParaCenario(cenario + 1); },
+      get humorAtual() { return humorAtual; }
+    };
   }
 
-  function falar(ms, humorDurante) {
-    if (!svg) return;
-    if (humorDurante) humor(humorDurante, ms + 5000);
-    if (humorDurante === 'travado') return; // travado não mexe a boca
-    clearTimeout(timerFala);
-    svg.classList.add('falando');
-    timerFala = setTimeout(function () { svg.classList.remove('falando'); }, ms);
-  }
-
-  function calar() {
-    if (!svg) return;
-    clearTimeout(timerFala);
-    svg.classList.remove('falando');
-  }
-
-  function aplicarCenario() {
-    var gs = svg.querySelectorAll('.cen');
-    for (var i = 0; i < gs.length; i++) gs[i].style.display = (i === cenario) ? '' : 'none';
-  }
-
-  function proximoCenario() {
-    cenario = (cenario + 1) % CENARIOS.length;
-    aplicarCenario();
-    return CENARIOS[cenario];
-  }
-
-  function irParaCenario(i) {
-    cenario = ((i % CENARIOS.length) + CENARIOS.length) % CENARIOS.length;
-    aplicarCenario();
-    return CENARIOS[cenario];
+  // o Ed "principal" é o do retrato; Ed.humor(), Ed.falar() etc. mexem nele
+  var principal = null;
+  function noPrincipal(nome) {
+    return function () { if (principal) return principal[nome].apply(null, arguments); };
   }
 
   window.Ed = {
-    montar: montar,
-    humor: humor,
-    falar: falar,
-    calar: calar,
-    proximoCenario: proximoCenario,
-    irParaCenario: irParaCenario,
     cenarios: CENARIOS.slice(),
-    get humorAtual() { return humorAtual; }
+    criar: criar,
+    montar: function (el) { principal = criar(el); return principal; },
+    humor: noPrincipal('humor'),
+    falar: noPrincipal('falar'),
+    calar: noPrincipal('calar'),
+    proximoCenario: noPrincipal('proximoCenario'),
+    irParaCenario: noPrincipal('irParaCenario'),
+    get humorAtual() { return principal ? principal.humorAtual : 'feliz'; }
   };
 })();

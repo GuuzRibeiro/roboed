@@ -1,16 +1,16 @@
-FOTOS DO ED (opcional)
-======================
+SUAS FOTOS DO ED (opcional)
+===========================
 
-Coloque aqui fotos do Robô Ed original com os nomes:
+Normalmente o site mostra fotos do Ed carregadas direto do site da InBot,
+a empresa que criou o personagem. Não precisa colocar nada aqui.
+
+Se quiser usar suas próprias fotos quando o site roda no seu computador,
+coloque aqui imagens com os nomes:
 
   ed-1.jpg, ed-2.jpg, ed-3.jpg ... até ed-12.jpg  (também pode ser .png)
 
-O site encontra as fotos sozinho e mostra no retrato do Ed.
-O botão "Mudar imagem do Ed" passa pelas fotos e depois pelos cenários desenhados.
+Elas aparecem no retrato no lugar das fotos da InBot. O botão
+"Mudar imagem do Ed" passa pelas fotos e depois pelos cenários desenhados.
 
 Tudo o que estiver nesta pasta (menos este arquivo) fica só no seu computador:
-a pasta está no .gitignore e não vai para o GitHub, porque a arte original
-do personagem pertence aos donos dela.
-
-As fotos só aparecem quando o site roda no seu computador
-(abrindo o index.html ou em localhost).
+a pasta está no .gitignore e não vai para o GitHub.

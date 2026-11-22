@@ -54,16 +54,16 @@ css/estilo.css    o visual "internet de antigamente"
 js/ed-robo.js     o desenho do Ed em SVG e as expressões dele
 js/cerebro.js     o cérebro: regras, respostas e memória
 js/site.js        liga tudo: chat, menu, jogo, quiz, contador
-fotos/            fotos opcionais do Ed (só no seu computador, veja abaixo)
+fotos/            suas fotos do Ed, opcionais (só no seu computador, veja abaixo)
 ```
 
-## Fotos do Ed de verdade (opcional)
+## As fotos do Ed
 
-O desenho do Ed neste repositório foi feito do zero em SVG. A arte original do personagem pertence aos donos dela, por isso ela **não** está aqui.
+O retrato mostra fotos do Ed original, carregadas **direto do site da [InBot](https://in.bot/cases/roboed/index.php)**, a empresa que criou o personagem. As imagens não ficam guardadas neste repositório, porque a arte do Ed pertence aos donos dela.
 
-Se quiser ver fotos do Ed original no retrato do site **no seu computador**, salve as imagens na pasta `fotos/` com os nomes `ed-1.jpg`, `ed-2.jpg`, `ed-3.jpg` e assim por diante (até `ed-12`, pode ser `.jpg` ou `.png`). O botão **Mudar imagem do Ed** passa a mostrar as fotos antes dos cenários desenhados.
+O botão **Mudar imagem do Ed** passa pelas fotos e depois pelos cenários desenhados, que foram feitos do zero em SVG ([`js/ed-robo.js`](js/ed-robo.js)). Se as fotos não carregarem (sem internet, por exemplo), o site mostra só o desenho.
 
-A pasta `fotos/` está no `.gitignore`, então essas imagens nunca vão pro GitHub. As fotos só aparecem quando o site roda no seu computador (abrindo o arquivo ou em `localhost`).
+Quer usar suas próprias fotos? Rodando o site no seu computador, salve imagens na pasta `fotos/` com os nomes `ed-1.jpg`, `ed-2.jpg`, `ed-3.jpg` e assim por diante (até `ed-12`, pode ser `.jpg` ou `.png`). Elas aparecem no lugar das fotos da InBot. A pasta `fotos/` está no `.gitignore`, então essas imagens não vão pro GitHub.
 
 ## Aviso
 

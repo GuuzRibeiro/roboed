@@ -213,10 +213,22 @@
   });
 
   /* ---------------- mudar imagem do Ed ----------------
-     O retrato mostra o desenho do Ed (com cenários). Se você tiver
-     fotos do Ed na pasta fotos/ (ed-1.jpg, ed-2.jpg...), elas entram
-     no rodízio também. Essa pasta fica só no seu computador: ela está
-     no .gitignore e não vai para o GitHub. */
+     O retrato começa com fotos do Ed original e depois passa pelos
+     cenários desenhados.
+     - As fotos vêm direto do site da InBot (empresa que criou o Ed).
+       Elas não ficam guardadas neste repositório.
+     - Rodando no seu computador, se a pasta fotos/ tiver ed-1.jpg,
+       ed-2.jpg..., essas fotos são usadas no lugar (a pasta está no
+       .gitignore e não vai para o GitHub).
+     - Se nenhuma foto carregar (sem internet, por exemplo), fica só
+       o desenho. */
+  var FOTOS_INBOT = [
+    'https://in.bot/cases/roboed/fotos/ed-foto-2.jpg',
+    'https://in.bot/assets/images/ed-orange-sm-147x196.jpg',
+    'https://in.bot/cases/roboed/fotos/ed-dia-da-arvore.jpg',
+    'https://in.bot/cases/roboed/fotos/ed-capacete-da-petrobras.jpg',
+    'https://in.bot/cases/roboed/fotos/ed-independencia-420.jpg'
+  ];
   var btnMudar = $('#btn-mudar');
   var fotoEd = $('#ed-foto');
   var imagens = Ed.cenarios.map(function (nome, i) {
@@ -248,9 +260,6 @@
   btnMudar.addEventListener('click', mudarImagem);
 
   (function procurarFotos() {
-    // só procura quando o site roda no seu computador
-    var local = location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
-    if (!local) return;
     function carregar(src) {
       return new Promise(function (ok) {
         var im = new Image();
@@ -259,24 +268,44 @@
         im.src = src;
       });
     }
-    var achadas = [];
-    function proxima(n) {
-      if (n > 12) return Promise.resolve();
-      return carregar('fotos/ed-' + n + '.jpg')
-        .then(function (s) { return s || carregar('fotos/ed-' + n + '.png'); })
-        .then(function (s) {
-          if (!s) return;
-          achadas.push(s);
-          return proxima(n + 1);
-        });
+
+    // fotos da pasta fotos/ (só quando o site roda no seu computador)
+    function fotosLocais() {
+      var local = location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+      var achadas = [];
+      if (!local) return Promise.resolve(achadas);
+      function proxima(n) {
+        if (n > 12) return Promise.resolve(achadas);
+        return carregar('fotos/ed-' + n + '.jpg')
+          .then(function (s) { return s || carregar('fotos/ed-' + n + '.png'); })
+          .then(function (s) {
+            if (!s) return achadas;
+            achadas.push(s);
+            return proxima(n + 1);
+          });
+      }
+      return proxima(1);
     }
-    proxima(1).then(function () {
-      if (!achadas.length) return;
-      var fotos = achadas.map(function (src, i) {
-        return { tipo: 'foto', src: src, nome: 'foto ' + (i + 1) + ' de ' + achadas.length };
+
+    // fotos do site da InBot (as que carregarem, na ordem da lista)
+    function fotosInbot() {
+      return Promise.all(FOTOS_INBOT.map(carregar)).then(function (r) {
+        return r.filter(Boolean);
       });
+    }
+
+    fotosLocais().then(function (locais) {
+      if (locais.length) return { lista: locais, credito: '' };
+      return fotosInbot().then(function (l) { return { lista: l, credito: ' · InBot' }; });
+    }).then(function (r) {
+      if (!r.lista.length) return;
+      var fotos = r.lista.map(function (src, i) {
+        return { tipo: 'foto', src: src, nome: 'foto ' + (i + 1) + '/' + r.lista.length + r.credito };
+      });
+      var noComeco = imgAtual === 0;
       imagens = fotos.concat(imagens);
-      mostrarImagem(0);
+      if (noComeco) mostrarImagem(0);
+      else imgAtual += fotos.length;
     });
   })();
 

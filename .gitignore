@@ -1,0 +1,13 @@
+# Fotos do Ed original: ficam só no seu computador (veja o README)
+fotos/*
+!fotos/LEIA-ME.txt
+
+# Configurações locais de editor/ferramentas
+.claude/
+.vscode/
+.idea/
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+desktop.ini

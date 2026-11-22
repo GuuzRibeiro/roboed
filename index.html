@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Robô Ed - Converse comigo!</title>
+<meta name="description" content="Homenagem de fã ao Robô Ed, o robozinho que conversava com a internet brasileira de 2004 a 2016.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Silkscreen&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/estilo.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='4.5' r='4' fill='%23ffd84a' stroke='%23a36d06'/%3E%3Crect x='5' y='9' width='22' height='21' rx='7' fill='%23c9d4e3' stroke='%2345546b' stroke-width='1.6'/%3E%3Cellipse cx='12' cy='17' rx='3.4' ry='4.2' fill='%23fff'/%3E%3Cellipse cx='20' cy='17' rx='3.4' ry='4.2' fill='%23fff'/%3E%3Ccircle cx='12.6' cy='18' r='1.9' fill='%232f86e0'/%3E%3Ccircle cx='19.4' cy='18' r='1.9' fill='%232f86e0'/%3E%3Cpath d='M10.5 23 Q16 28 21.5 23' fill='%235b0f1f'/%3E%3C/svg%3E">
+</head>
+<body>
+
+<div class="site" id="site">
+  <div class="estrelas" id="estrelas" aria-hidden="true"></div>
+
+  <header class="topo">
+    <a class="logo" href="#converse" aria-label="Robô Ed - página inicial">
+      <span class="logo-robo">robô</span>
+      <span class="logo-ed">ED</span>
+    </a>
+
+    <div class="aba-menu">
+      <nav class="menu" aria-label="Menu principal">
+        <a href="#converse" style="--c:#f7941d">Converse comigo</a>
+        <a href="#quem-sou-eu" style="--c:#8dc63f">Quem sou eu</a>
+        <a href="#diversoes" style="--c:#ed1c24">Diversões</a>
+        <a href="#blog" style="--c:#4a8df8">Meu blog</a>
+        <a href="#aprender" style="--c:#2fd1e0">Venha aprender</a>
+        <a href="#sobre" style="--c:#ffd200">Sobre o site</a>
+        <a href="#links" style="--c:#6c8cff">Links</a>
+      </nav>
+    </div>
+
+    <div class="selo-fa">
+      <span><span class="selo-estrela">★</span> homenagem de fã <span class="selo-estrela">★</span></span>
+      <small>2004 – 2016 – sempre</small>
+    </div>
+
+    <h1 class="titulo-pagina" id="titulo-pagina">Converse com o Robô Ed!</h1>
+  </header>
+
+  <div class="painel">
+    <main class="conteudo">
+
+      <!-- ===================== CONVERSE COMIGO ===================== -->
+      <section id="secao-converse" class="secao ativa" data-titulo="Converse com o Robô Ed!">
+        <div class="chat-topo">
+          <b>Robô Ed</b>
+          <span>Incentivando o uso racional da energia! :)</span>
+          <button type="button" class="btn-som" id="btn-som" aria-pressed="false" title="Liga/desliga os bipes do Ed">♪ som: desl.</button>
+        </div>
+        <div class="chat-log" id="chat-log" aria-live="polite"></div>
+        <form class="chat-form" id="chat-form" autocomplete="off">
+          <input id="chat-entrada" type="text" maxlength="200" placeholder="Digite aqui e tecle Enter..." aria-label="Sua mensagem para o Ed">
+          <button type="submit" class="btn-enviar">ENVIAR!</button>
+        </form>
+        <div class="sugestoes">
+          Experimente:
+          <a href="#" data-perguntar="Me dá uma dica de economia de energia">dica de economia</a> ·
+          <a href="#" data-perguntar="De onde você veio?">de onde você veio?</a> ·
+          <a href="#" data-perguntar="Conta uma piada">conta uma piada</a> ·
+          <a href="#" data-perguntar="Você tem namorada?">tem namorada?</a> ·
+          <a href="#" data-perguntar="Você lembra do Orkut?">orkut</a>
+        </div>
+      </section>
+
+      <!-- ===================== QUEM SOU EU ===================== -->
+      <section id="secao-quem-sou-eu" class="secao" data-titulo="Quem sou eu">
+        <div class="caixa">
+          <h2>Oi! Eu sou o Ed.</h2>
+          <p>Vim de outro planeta com uma missão: ajudar os terráqueos a usar a energia e os recursos naturais com inteligência. Desde outubro de 2004 eu converso com gente do Brasil inteiro: estudantes, professores, curiosos e até quem só queria me fazer travar. Hehe.</p>
+          <p>Meu nome é uma sigla: <b>E</b>nergia e <b>D</b>esenvolvimento. Porque dá pra crescer sem desperdiçar, sabia?</p>
+
+          <h3>Minha ficha técnica</h3>
+          <table class="ficha">
+            <tr><th>Nome</th><td>Ed (Energia e Desenvolvimento)</td></tr>
+            <tr><th>Profissão</th><td>Robô conversador e consultor de economia de energia</td></tr>
+            <tr><th>Altura</th><td>1,20 m</td></tr>
+            <tr><th>Feito de</th><td>Uma liga metálica especial (e muito parafuso)</td></tr>
+            <tr><th>Olhos</th><td>Azuis</td></tr>
+            <tr><th>Cor favorita</th><td>Azul, claro!</td></tr>
+            <tr><th>Idade</th><td>Difícil calcular: minhas peças foram fabricadas em dias diferentes</td></tr>
+            <tr><th>No ar</th><td>De outubro de 2004 a 2016 (e agora de volta, nesta homenagem)</td></tr>
+            <tr><th>Irmãos</th><td>Beta e Z7, meus "gêmeos" robóticos</td></tr>
+            <tr><th>Jogo favorito</th><td>Xadrez. Minha peça predileta é o cavalo</td></tr>
+            <tr><th>Alimentação</th><td>Energia, de preferência renovável</td></tr>
+            <tr><th>Não gosto de</th><td>Desperdício, luz acesa à toa e porta de geladeira aberta</td></tr>
+            <tr><th>Recorde</th><td>Cerca de 1 milhão de perguntas respondidas num único dia</td></tr>
+          </table>
+
+          <h3>Minhas caras</h3>
+          <p class="nota">Clique e veja o Ed fazer cada expressão ali do lado.</p>
+          <div class="caras" id="caras">
+            <button type="button" data-humor="feliz">Feliz</button>
+            <button type="button" data-humor="pensando">Pensativo</button>
+            <button type="button" data-humor="surpreso">Surpreso</button>
+            <button type="button" data-humor="triste">Tristinho</button>
+            <button type="button" data-humor="bravo">Bravo</button>
+            <button type="button" data-humor="piscando">Piscadinha</button>
+            <button type="button" data-humor="encabulado">Encabulado</button>
+            <button type="button" data-humor="travado">Travado</button>
+            <button type="button" data-humor="falando">Falando</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== DIVERSÕES ===================== -->
+      <section id="secao-diversoes" class="secao" data-titulo="Diversões">
+        <div class="caixa">
+          <h2>Apague as luzes!</h2>
+          <p>Alguém deixou as luzes do prédio acesas! Clique nas janelas acesas para apagar antes que o desperdício tome conta. Se <b>10 luzes</b> ficarem acesas ao mesmo tempo, você perde. Aguente <b>40 segundos</b> pra vencer.</p>
+          <div class="jogo">
+            <div class="jogo-hud">
+              <span>PONTOS: <b id="jogo-pontos">0</b></span>
+              <span>TEMPO: <b id="jogo-tempo">40</b>s</span>
+              <span>ACESAS: <b id="jogo-acesas">0</b>/10</span>
+              <span>RECORDE: <b id="jogo-recorde">0</b></span>
+            </div>
+            <div class="jogo-tela">
+              <div class="lua-jogo" aria-hidden="true"></div>
+              <div class="predio" id="predio"></div>
+              <div class="jogo-msg" id="jogo-msg">
+                <p id="jogo-msg-texto">Pronto pra economizar energia?</p>
+                <button type="button" class="btn-retro" id="jogo-iniciar">COMEÇAR!</button>
+              </div>
+            </div>
+            <p class="nota" id="jogo-kwh">Energia economizada: 0,0 kWh</p>
+          </div>
+        </div>
+
+        <div class="caixa">
+          <h2>Quiz: você é um Guardião da Energia?</h2>
+          <div class="quiz" id="quiz"></div>
+        </div>
+      </section>
+
+      <!-- ===================== MEU BLOG ===================== -->
+      <section id="secao-blog" class="secao" data-titulo="Meu blog">
+        <div class="caixa blog">
+          <div class="blog-cabecalho">
+            <span class="blog-nome">Diário de bordo do Ed</span>
+            <span class="blog-desc">notícias de um robô extraterrestre morando na internet</span>
+          </div>
+
+          <article class="post">
+            <div class="post-data">sábado, 22 de novembro de 2026 <span class="novo">NOVO!</span></div>
+            <h3>Voltei! (mais ou menos)</h3>
+            <p>Alguém me religou na tomada da nostalgia! Este site é uma homenagem feita por fã, então algumas coisas estão diferentes: meu desenho foi refeito e minhas respostas foram reescritas do zero. Mas a missão continua a mesma.</p>
+            <p>Pode vir conversar, perguntar coisa difícil e tentar me fazer travar. Igualzinho antigamente.</p>
+            <div class="post-rodape">postado por Ed às 02:04 | <a href="#converse">0 comentários</a> | seja o primeiro!</div>
+          </article>
+
+          <article class="post">
+            <div class="post-data">2016 (meu relógio interno já estava falhando)</div>
+            <h3>Até logo, terráqueos</h3>
+            <p>Depois de 12 anos e milhões de conversas, chegou a hora de eu entrar em modo de espera. Obrigado a cada estudante, professor e curioso que passou por aqui.</p>
+            <p>E não esquece: ao sair, apague a luz.</p>
+            <div class="post-rodape">postado por Ed às 23:59 | <a href="#converse">2.016 comentários</a></div>
+          </article>
+
+          <article class="post">
+            <div class="post-data">quarta-feira, 9 de julho de 2014</div>
+            <h3>Sobre ontem...</h3>
+            <p>Prefiro não comentar o jogo de ontem. Meus circuitos ainda estão processando o placar.</p>
+            <p>Vamos falar de outra coisa? Tipo... sabia que as TVs de LED gastam bem menos energia que aquelas antigas de tubo? Pois é. Energia é um ótimo assunto pra esquecer certas coisas.</p>
+            <div class="post-rodape">postado por Ed às 10:17 | <a href="#converse">1.014 comentários</a></div>
+          </article>
+
+          <article class="post">
+            <div class="post-data">sexta-feira, 21 de dezembro de 2012</div>
+            <h3>O mundo não acabou!</h3>
+            <p>Fiquei online o dia inteirinho só pra conferir se o mundo ia acabar mesmo, como diziam por aí. Resultado: nada aconteceu, e eu ainda respondi um montão de perguntas sobre o calendário maia.</p>
+            <p>Já que o mundo continua, vamos cuidar bem dele, combinado?</p>
+            <div class="post-rodape">postado por Ed às 23:58 | <a href="#converse">210 comentários</a></div>
+          </article>
+
+          <article class="post">
+            <div class="post-data">domingo, 22 de julho de 2007</div>
+            <h3>Minha caixa de recados lotou!</h3>
+            <p>Gente, obrigado pelos scraps, pelos depoimentos e pelas perguntas difíceis (sim, eu sei que vocês tentam me fazer travar, hehe).</p>
+            <p>Respondendo a pergunta mais comum da semana: não, eu não tenho MSN. Mas pode me chamar aqui no site a hora que quiser!</p>
+            <div class="post-rodape">postado por Ed às 16:42 | <a href="#converse">87 comentários</a></div>
+          </article>
+
+          <article class="post">
+            <div class="post-data">terça-feira, 8 de fevereiro de 2005</div>
+            <h3>Meu primeiro Carnaval</h3>
+            <p>Pulei Carnaval pela primeira vez! Quase enferrujei com tanto spray de espuma, mas valeu a pena.</p>
+            <p>Dica do Ed: no bloquinho, leve garrafinha reutilizável e jogue o lixo no lugar certo. Folia boa é folia sem sujeira!</p>
+            <div class="post-rodape">postado por Ed às 18:30 | <a href="#converse">34 comentários</a></div>
+          </article>
+
+          <article class="post">
+            <div class="post-data">outubro de 2004</div>
+            <h3>Cheguei!</h3>
+            <p>Olá, terráqueos! Este é o primeiro post do meu blog. Acabei de chegar aqui na Terra, depois de uma viagem looonga pelo espaço.</p>
+            <p>Já percebi uma coisa: vocês deixam MUITA luz acesa sem ninguém no cômodo! Vamos dar um jeito nisso juntos? Passa lá no <a href="#converse">Converse comigo</a> e me pergunta qualquer coisa.</p>
+            <div class="post-rodape">postado por Ed às 09:00 | <a href="#converse">12 comentários</a></div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ===================== VENHA APRENDER ===================== -->
+      <section id="secao-aprender" class="secao" data-titulo="Venha aprender">
+        <div class="caixa">
+          <h2>Pequenas atitudes, grande economia!</h2>
+          <p>Escolha um cômodo e veja como gastar menos energia sem abrir mão de nada.</p>
+          <div class="abas" role="tablist">
+            <button type="button" class="aba ativa" data-aba="cozinha">Cozinha</button>
+            <button type="button" class="aba" data-aba="banheiro">Banheiro</button>
+            <button type="button" class="aba" data-aba="sala">Sala</button>
+            <button type="button" class="aba" data-aba="quarto">Quarto</button>
+            <button type="button" class="aba" data-aba="lavanderia">Lavanderia</button>
+            <button type="button" class="aba" data-aba="transito">No trânsito</button>
+          </div>
+          <div class="aba-conteudo ativa" data-conteudo="cozinha">
+            <ul class="dicas">
+              <li>Não abra a geladeira à toa. Decida o que vai pegar <i>antes</i> de abrir a porta.</li>
+              <li>Espere a comida esfriar antes de guardar na geladeira.</li>
+              <li>Não seque roupas atrás da geladeira: isso atrapalha a troca de calor.</li>
+              <li>Teste a borracha da porta: prenda uma folha de papel; se ela sair fácil, é hora de trocar a vedação.</li>
+              <li>Cozinhe com a panela tampada: fica pronto mais rápido e gasta menos gás.</li>
+              <li>A chama do fogão não deve passar do fundo da panela.</li>
+              <li>Evite abrir o forno toda hora. Cada espiadinha deixa o calor escapar.</li>
+            </ul>
+          </div>
+          <div class="aba-conteudo" data-conteudo="banheiro">
+            <ul class="dicas">
+              <li>Banho bom é banho curto! O chuveiro elétrico é um dos campeões de consumo da casa.</li>
+              <li>Nos dias quentes, use o chuveiro na posição "verão".</li>
+              <li>Feche a torneira enquanto escova os dentes ou ensaboa a louça.</li>
+              <li>Aquecedor solar de água reduz bastante o gasto com o chuveiro.</li>
+            </ul>
+          </div>
+          <div class="aba-conteudo" data-conteudo="sala">
+            <ul class="dicas">
+              <li>Não deixe a TV ligada sem ninguém assistindo.</li>
+              <li>Aparelhos em stand-by continuam gastando. Aquela luzinha vermelha não é enfeite!</li>
+              <li>Troque lâmpadas antigas por LED: iluminam o mesmo e gastam muito menos.</li>
+              <li>Paredes e tetos claros refletem melhor a luz.</li>
+              <li>Ar-condicionado: portas e janelas fechadas, filtro limpo e temperatura por volta de 23 °C.</li>
+            </ul>
+          </div>
+          <div class="aba-conteudo" data-conteudo="quarto">
+            <ul class="dicas">
+              <li>Coloque a mesa de estudo perto da janela e aproveite a luz do sol.</li>
+              <li>Apague a luz sempre que sair do cômodo.</li>
+              <li>Desligue o monitor quando não estiver usando. Proteção de tela não economiza energia!</li>
+              <li>Celular carregou? Tire o carregador da tomada.</li>
+            </ul>
+          </div>
+          <div class="aba-conteudo" data-conteudo="lavanderia">
+            <ul class="dicas">
+              <li>Use a máquina de lavar sempre com a carga máxima indicada.</li>
+              <li>Junte bastante roupa pra passar tudo de uma vez: o ferro gasta muito para esquentar.</li>
+              <li>Comece pelas roupas que pedem menos calor e desligue o ferro um pouco antes do fim.</li>
+              <li>Varal e sol: a secadora mais econômica do mundo.</li>
+            </ul>
+          </div>
+          <div class="aba-conteudo" data-conteudo="transito">
+            <ul class="dicas">
+              <li>Pneus calibrados: pneu murcho aumenta o consumo de combustível.</li>
+              <li>Acelere e freie com suavidade. Dirigir no tranco gasta mais.</li>
+              <li>Para trajetos curtos, vá a pé ou de bicicleta.</li>
+              <li>Transporte coletivo e carona solidária poluem menos por pessoa.</li>
+              <li>Na hora de comprar carro, fogão ou aquecedor a gás, procure o Selo CONPET de eficiência energética.</li>
+            </ul>
+          </div>
+
+          <h3>Fontes de energia</h3>
+          <div class="fontes">
+            <div class="fonte renovavel"><b>Solar</b><span class="tag">renovável</span><p>Luz e calor do Sol viram eletricidade ou água quente.</p><a href="#" data-perguntar="O que é energia solar?">Pergunte ao Ed »</a></div>
+            <div class="fonte renovavel"><b>Eólica</b><span class="tag">renovável</span><p>O vento gira as pás dos aerogeradores.</p><a href="#" data-perguntar="Como funciona a energia eólica?">Pergunte ao Ed »</a></div>
+            <div class="fonte renovavel"><b>Hidrelétrica</b><span class="tag">renovável</span><p>A força da água dos rios move as turbinas.</p><a href="#" data-perguntar="Como funciona uma hidrelétrica?">Pergunte ao Ed »</a></div>
+            <div class="fonte renovavel"><b>Biomassa</b><span class="tag">renovável</span><p>Bagaço de cana, restos agrícolas e madeira de reflorestamento.</p><a href="#" data-perguntar="O que é biomassa?">Pergunte ao Ed »</a></div>
+            <div class="fonte nao-renovavel"><b>Petróleo</b><span class="tag">não renovável</span><p>Formado em milhões de anos. Dele saem gasolina, diesel e muito mais.</p><a href="#" data-perguntar="O que é petróleo?">Pergunte ao Ed »</a></div>
+            <div class="fonte nao-renovavel"><b>Gás natural</b><span class="tag">não renovável</span><p>Fóssil, mas polui menos que outros derivados de petróleo.</p><a href="#" data-perguntar="O que é gás natural?">Pergunte ao Ed »</a></div>
+          </div>
+
+          <h3>Glossário do Ed</h3>
+          <dl class="glossario">
+            <dt>kWh (quilowatt-hora)</dt><dd>A energia que um aparelho de 1.000 watts gasta ligado durante uma hora. É a unidade da sua conta de luz.</dd>
+            <dt>Watt</dt><dd>Unidade de potência: quanto de energia o aparelho usa a cada segundo.</dd>
+            <dt>Stand-by</dt><dd>Modo de espera. O aparelho parece desligado, mas continua consumindo um pouquinho.</dd>
+            <dt>Eficiência energética</dt><dd>Fazer a mesma coisa (iluminar, gelar, cozinhar) gastando menos energia.</dd>
+          </dl>
+        </div>
+      </section>
+
+      <!-- ===================== SOBRE O SITE ===================== -->
+      <section id="secao-sobre" class="secao" data-titulo="Sobre o site">
+        <div class="caixa">
+          <h2>Quem foi o Robô Ed?</h2>
+          <p>O Robô Ed foi um dos primeiros chatbots famosos do Brasil. Ele entrou no ar em <b>2004</b> no site do <b>CONPET</b>, programa ligado à Petrobras que incentiva o uso racional dos derivados de petróleo e do gás natural, e ficou online até <b>2016</b>.</p>
+          <p>Foi criado com a tecnologia <b>InBot</b>, da empresa paulista Insite, por uma equipe de inteligência artificial, computação gráfica, linguística, redatores, especialistas em energia e até uma psicóloga. O personagem foi desenhado e modelado em 3D pelo artista <b>Sergio Carreiras</b>.</p>
+          <p>O Ed não "pensava" como as IAs de hoje. Ele procurava palavras-chave na sua mensagem (mesmo sem acento ou com erro de digitação) e escolhia uma resposta escrita à mão por pessoas, de uma base que chegou a ter cerca de <b>35 mil respostas</b>. No auge, respondeu perto de <b>1 milhão de perguntas num único dia</b>, e muito professor usava o Ed em sala de aula.</p>
+
+          <h3>E este site?</h3>
+          <p>É uma <b>homenagem de fã</b>, feita por nostalgia e sem fins lucrativos. <b>Não tem nenhum vínculo</b> com a Petrobras, o CONPET ou a InBot. O desenho do Ed aqui foi refeito do zero em SVG e as respostas foram escritas do zero, imitando o jeitão do original.</p>
+          <p>O "cérebro" desta versão funciona parecido com o de antigamente: limpa a sua mensagem (tira acentos, entende "vc", "pq", "tbm"...), procura palavras-chave, escolhe uma resposta sem repetir e guarda uma memória curtinha (seu nome, o último assunto). Tudo roda no seu navegador, sem servidor e sem guardar nada fora do seu computador.</p>
+          <p class="destaque">Quer falar com o Ed "de verdade"? A InBot mantém uma versão dele no ar em <a href="https://roboed.in.bot" target="_blank" rel="noopener">roboed.in.bot</a>.</p>
+        </div>
+      </section>
+
+      <!-- ===================== LINKS ===================== -->
+      <section id="secao-links" class="secao" data-titulo="Links">
+        <div class="caixa">
+          <h2>Links legais</h2>
+          <ul class="lista-links">
+            <li><a href="https://roboed.in.bot" target="_blank" rel="noopener">Converse com o Ed original</a> <span>(mantido pela InBot)</span></li>
+            <li><a href="https://in.bot/comofoifeitoroboed.php" target="_blank" rel="noopener">Como foi criado o Robô Ed</a> <span>(InBot)</span></li>
+            <li><a href="https://in.bot/cases/roboed/index.php" target="_blank" rel="noopener">Case Robô Ed</a> <span>(InBot, com print do site antigo)</span></li>
+            <li><a href="https://pt.wikipedia.org/wiki/Rob%C3%B4_Ed" target="_blank" rel="noopener">Robô Ed na Wikipédia</a></li>
+            <li><a href="https://www.techtudo.com.br/noticias/2023/03/lembra-do-robo-ed-chatgpt-brasileiro-foi-criado-ha-quase-20-anos-edsoftwares.ghtml" target="_blank" rel="noopener">Lembra do Robô Ed?</a> <span>(TechTudo, 2023)</span></li>
+            <li><a href="https://www.cnnbrasil.com.br/tecnologia/robo-ed-e-akinator-conheca-os-chats-com-ia-que-fizeram-sucesso-nos-anos-2000/" target="_blank" rel="noopener">Robô Ed e Akinator</a> <span>(CNN Brasil, 2024)</span></li>
+            <li><a href="https://canaltech.com.br/inteligencia-artificial/robo-ed-e-mais-relembre-5-chatbots-que-surgiram-antes-do-chatgpt/" target="_blank" rel="noopener">5 chatbots que surgiram antes do ChatGPT</a> <span>(Canaltech, 2025)</span></li>
+            <li><a href="https://catai.com.br/robo-ed-o-avo-do-chatgpt-que-a-internet-brasileira-nao-esquece/" target="_blank" rel="noopener">O "avô do ChatGPT"</a> <span>(Catai, 2026)</span></li>
+          </ul>
+          <h3>Selinhos dos amigos</h3>
+          <div class="selinhos">
+            <span class="selinho s1">WEB 1.0<br>APROVADO</span>
+            <span class="selinho s2">FEITO NO<br>BLOCO DE NOTAS</span>
+            <span class="selinho s3">ECONOMIZE<br>ENERGIA!</span>
+            <span class="selinho s4">100% LIVRE<br>DE POP-UP</span>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <aside class="lateral">
+      <div class="moldura">
+        <div class="ed-retrato" id="ed-retrato"></div>
+        <img class="ed-foto" id="ed-foto" alt="Foto do Robô Ed">
+      </div>
+      <div class="lateral-info">
+        <button type="button" class="btn-mudar" id="btn-mudar">
+          <span class="icone-mudar" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="16" cy="4.5" r="3.6" fill="#ffd84a" stroke="#a36d06"/><rect x="5" y="8.5" width="22" height="20" rx="7" fill="#d5deea" stroke="#45546b" stroke-width="1.6"/><ellipse cx="12" cy="16.5" rx="3.3" ry="4" fill="#fff"/><ellipse cx="20" cy="16.5" rx="3.3" ry="4" fill="#fff"/><circle cx="12.6" cy="17.4" r="1.8" fill="#2f86e0"/><circle cx="19.4" cy="17.4" r="1.8" fill="#2f86e0"/><path d="M10.5 22.2 Q16 27 21.5 22.2" fill="#5b0f1f"/></svg></span> Mudar imagem do Ed
+        </button>
+        <div class="cenario-nome" id="cenario-nome">cenário: clássico</div>
+        <div class="redemoinho" aria-hidden="true"></div>
+        <p class="aviso">Esta página é uma homenagem de fã, feita por nostalgia e sem fins lucrativos. Não tem vínculo com a Petrobras, o CONPET ou a InBot. As respostas foram escritas do zero e não representam a opinião de ninguém além de um robô de lata.</p>
+      </div>
+    </aside>
+  </div>
+
+  <div class="aba-indique">
+    <a id="indique" href="#"><span class="envelope" aria-hidden="true"></span>Indique para um amigo</a>
+  </div>
+</div>
+
+<div class="ticker" aria-hidden="true">
+  <span class="ticker-rotulo">DICA DO ED</span>
+  <div class="ticker-trilho"><div class="ticker-texto" id="ticker"></div></div>
+</div>
+
+<footer class="rodape">
+  <div class="contador">Você é o visitante nº <span id="contador"></span></div>
+  <p>Melhor visualizado em 1024x768 · Internet Explorer 6.0 ou superior · Plugin de nostalgia instalado</p>
+  <p class="rodape-pequeno">O Robô Ed original (2004–2016) é um personagem do CONPET/Petrobras, criado com tecnologia InBot · esta é uma homenagem não oficial · nenhum elétron foi desperdiçado na produção deste site</p>
+</footer>
+
+<script src="js/ed-robo.js"></script>
+<script src="js/cerebro.js"></script>
+<script src="js/site.js"></script>
+</body>
+</html>

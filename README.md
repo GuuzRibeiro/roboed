@@ -4,7 +4,9 @@ Lembra do **Robô Ed**? O robozinho que conversava com a internet brasileira de 
 
 Este projeto recria o site dele com a estética de internet de antigamente: fundo azul estrelado, menu com fonte pixelada, contador de visitas, letreiro de dicas e o aviso "melhor visualizado em 1024x768".
 
-![Print do site](docs/print.jpg)
+### ▶ [Converse com o Ed agora: guuzribeiro.github.io/roboed](https://guuzribeiro.github.io/roboed/)
+
+[![Print do site](docs/print.jpg)](https://guuzribeiro.github.io/roboed/)
 
 ## O que tem
 
@@ -17,7 +19,9 @@ Este projeto recria o site dele com a estética de internet de antigamente: fund
 
 ## Como abrir
 
-Não precisa instalar nada. Baixe o projeto (botão verde **Code → Download ZIP**) e dê dois cliques no `index.html`.
+O jeito mais fácil é abrir o link: [guuzribeiro.github.io/roboed](https://guuzribeiro.github.io/roboed/).
+
+Pra rodar no seu computador, não precisa instalar nada. Baixe o projeto (botão verde **Code → Download ZIP**) e dê dois cliques no `index.html`.
 
 Funciona offline. Só as fontes do Google precisam de internet; sem elas, o site usa fontes do próprio computador.
 

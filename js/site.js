@@ -213,15 +213,14 @@
   });
 
   /* ---------------- mudar imagem do Ed ----------------
-     O retrato começa com fotos do Ed original e depois passa pelos
-     cenários desenhados.
+     O retrato mostra só fotos do Ed original.
      - As fotos vêm direto do site da InBot (empresa que criou o Ed).
        Elas não ficam guardadas neste repositório.
      - Rodando no seu computador, se a pasta fotos/ tiver ed-1.jpg,
        ed-2.jpg..., essas fotos são usadas no lugar (a pasta está no
        .gitignore e não vai para o GitHub).
-     - Se nenhuma foto carregar (sem internet, por exemplo), fica só
-       o desenho. */
+     - Se nenhuma foto carregar (sem internet, por exemplo), aparece o
+       desenho do Ed, só pra moldura não ficar vazia. */
   var FOTOS_INBOT = [
     'https://in.bot/cases/roboed/fotos/ed-foto-2.jpg',
     'https://in.bot/assets/images/ed-orange-sm-147x196.jpg',
@@ -231,25 +230,19 @@
   ];
   var btnMudar = $('#btn-mudar');
   var fotoEd = $('#ed-foto');
-  var imagens = Ed.cenarios.map(function (nome, i) {
-    return { tipo: 'desenho', i: i, nome: 'cenário: ' + nome };
-  });
+  var fotos = [];   // { src, nome }, preenchida quando as fotos carregam
   var imgAtual = 0;
 
   function mostrarImagem(k) {
-    imgAtual = (k + imagens.length) % imagens.length;
-    var im = imagens[imgAtual];
-    if (im.tipo === 'foto') {
-      fotoEd.src = im.src;
-      moldura.classList.add('com-foto');
-    } else {
-      moldura.classList.remove('com-foto');
-      Ed.irParaCenario(im.i);
-    }
-    $('#cenario-nome').textContent = im.nome;
+    if (!fotos.length) return;
+    imgAtual = (k + fotos.length) % fotos.length;
+    fotoEd.src = fotos[imgAtual].src;
+    moldura.classList.add('com-foto');
+    $('#cenario-nome').textContent = fotos[imgAtual].nome;
   }
 
   function mudarImagem() {
+    if (fotos.length < 2) return;
     mostrarImagem(imgAtual + 1);
     Ed.humor('surpreso', 1400);
     bip('clique');
@@ -305,14 +298,18 @@
       if (locais.length) return { lista: locais, credito: '' };
       return fotosInbot().then(function (l) { return { lista: l, credito: ' · InBot' }; });
     }).then(function (r) {
-      if (!r.lista.length) return;
-      var fotos = r.lista.map(function (src, i) {
-        return { tipo: 'foto', src: src, nome: 'foto ' + (i + 1) + '/' + r.lista.length + r.credito };
+      if (!r.lista.length) {
+        // nenhuma foto carregou: mostra o desenho pra moldura não ficar vazia
+        moldura.classList.remove('com-foto');
+        btnMudar.style.display = 'none';
+        $('#cenario-nome').textContent = '';
+        return;
+      }
+      fotos = r.lista.map(function (src, i) {
+        return { src: src, nome: 'foto ' + (i + 1) + '/' + r.lista.length + r.credito };
       });
-      var noComeco = imgAtual === 0;
-      imagens = fotos.concat(imagens);
-      if (noComeco) mostrarImagem(0);
-      else imgAtual += fotos.length;
+      if (fotos.length < 2) btnMudar.style.display = 'none';
+      mostrarImagem(0);
     });
   })();
 

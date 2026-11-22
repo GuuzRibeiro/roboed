@@ -84,7 +84,7 @@ fotos/            suas fotos do Ed, opcionais (só no seu computador, veja abaix
 
 O retrato mostra fotos do Ed original, carregadas **direto do site da [InBot](https://in.bot/cases/roboed/index.php)**, a empresa que criou o personagem. As imagens não ficam guardadas neste repositório, porque a arte do Ed pertence aos donos dela.
 
-O botão **Mudar imagem do Ed** passa pelas fotos e depois pelos cenários desenhados, que foram feitos do zero em SVG ([`js/ed-robo.js`](js/ed-robo.js)). Se as fotos não carregarem (sem internet, por exemplo), o site mostra só o desenho.
+O botão **Mudar imagem do Ed** passa só pelas fotos reais. Se nenhuma foto carregar (sem internet, por exemplo), a moldura mostra um desenho do Ed feito do zero em SVG ([`js/ed-robo.js`](js/ed-robo.js)), só pra não ficar vazia.
 
 Quer usar suas próprias fotos? Rodando o site no seu computador, salve imagens na pasta `fotos/` com os nomes `ed-1.jpg`, `ed-2.jpg`, `ed-3.jpg` e assim por diante (até `ed-12`, pode ser `.jpg` ou `.png`). Elas aparecem no lugar das fotos da InBot. A pasta `fotos/` está no `.gitignore`, então essas imagens não vão pro GitHub.
 

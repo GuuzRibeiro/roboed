@@ -18,7 +18,7 @@ Este projeto recria o site dele com a estética de internet de antigamente: fund
   - Canta (em bipes) e pede arrego depois de um tempo. Pergunte se ele conhece o Latino!
   - Lembra o seu nome, faz contas e reclama se você repetir a mesma pergunta.
 - **Quem sou eu**: a apresentação e a ficha técnica do Ed.
-- **Diversões**: o joguinho *Apague as luzes!* e um quiz pra descobrir se você é um Guardião da Energia.
+- **Diversões**: xadrez contra o Ed, com cinco níveis (do Iniciante ao Impossível), e um quiz pra descobrir se você é um Guardião da Energia.
 - **Meu blog**: posts do Ed de 2004 a 2016.
 - **Venha aprender**: dicas de economia por cômodo da casa e as fontes de energia.
 - **Sobre o site** e **Links**: a história do Ed original e matérias sobre ele.
@@ -29,7 +29,7 @@ O jeito mais fácil é abrir o link: [guuzribeiro.github.io/roboed](https://guuz
 
 Pra rodar no seu computador, não precisa instalar nada. Baixe o projeto (botão verde **Code → Download ZIP**) e dê dois cliques no `index.html`.
 
-Funciona offline. Só as fotos do Ed, as fontes do Google e o contador de visitas precisam de internet; sem elas, o site mostra o desenho do Ed, usa fontes do próprio computador e esconde o contador.
+Funciona offline. Só as fotos do Ed, as fontes do Google, o contador de visitas e o Stockfish do xadrez precisam de internet; sem eles, o site mostra o desenho do Ed, usa fontes do próprio computador, esconde o contador e o Ed joga xadrez com um motor mais simples.
 
 ## Como o "cérebro" funciona
 
@@ -62,6 +62,24 @@ pietra: { d: 'Pietra', s: 'pedra', l: ['a Pedra da Gávea, lá no Rio de Janeiro
 
 A chave (`pietra`) é o nome em minúsculas e sem acento, `d` é como se escreve, `s` é o significado e cada item de `l` completa a frase "O nome Pietra me lembra...". Só o `d` é obrigatório. No mesmo arquivo ficam os lugares (com o jeito de chamar quem nasce lá, tipo "mineiro") e os famosos.
 
+## Xadrez contra o Ed
+
+Na seção **Diversões** dá pra jogar xadrez contra o Ed. Arraste a peça ou clique nela e depois na casa. Dá pra escolher as peças (brancas, pretas ou sorteio), voltar lance e desistir. A partida e o placar ficam guardados no navegador.
+
+O cérebro de xadrez do Ed é o [Stockfish](https://stockfishchess.org), um dos motores de xadrez mais fortes do mundo, na versão para navegador do [stockfish.js](https://github.com/niklasf/stockfish.js) (Niklas Fiekas). Ele é carregado do [cdnjs](https://cdnjs.com/libraries/stockfish.js) e roda num Web Worker, sem travar a página.
+
+Os níveis funcionam como os bots dos sites de xadrez: o motor é o mesmo, mas nos níveis mais fáceis ele pensa menos e, de propósito, às vezes escolhe um lance pior (a opção *Skill Level* do Stockfish, de 0 a 20).
+
+| Nível | Como o Ed joga |
+|---|---|
+| Iniciante | Skill Level 0, pensa só 1 lance à frente |
+| Fácil | Skill Level 3, 0,3 s por lance |
+| Médio | Skill Level 8, 0,6 s por lance |
+| Difícil | Skill Level 14, 1,2 s por lance |
+| Impossível | força total, 2,5 s por lance |
+
+Se o Stockfish não carregar (sem internet, por exemplo), entra um motor reserva escrito do zero em [`js/xadrez.js`](js/xadrez.js). Ele é bem mais fraco, mas ainda dá trabalho. O mesmo arquivo tem as regras completas: roque, en passant, promoção, xeque-mate, afogamento, regra dos 50 lances, tripla repetição e material insuficiente.
+
 ## Contador de visitas
 
 O "Você é o visitante nº" do rodapé conta de verdade. Ele usa o [Abacus](https://abacus.jasoncameron.dev), um contador gratuito e aberto que não pede cadastro. Cada pessoa conta uma vez por sessão, então recarregar a página não aumenta o número. Rodando o site no seu computador, ele só mostra o total, sem somar visita.
@@ -76,7 +94,8 @@ css/estilo.css    o visual "internet de antigamente"
 js/ed-robo.js     o desenho do Ed em SVG e as expressões dele
 js/nomes.js       o que o Ed sabe sobre nomes, lugares e famosos
 js/cerebro.js     o cérebro: regras, respostas e memória
-js/site.js        liga tudo: chat, menu, jogo, quiz, contador
+js/xadrez.js      o xadrez: regras, tabuleiro, motor reserva e a ponte com o Stockfish
+js/site.js        liga tudo: chat, menu, xadrez, quiz, contador
 fotos/            suas fotos do Ed, opcionais (só no seu computador, veja abaixo)
 ```
 
@@ -109,5 +128,7 @@ Quer conversar com o Ed "de verdade"? A InBot mantém uma versão dele no ar em 
 ## Licença
 
 O código e os textos deste repositório estão sob a [licença MIT](LICENSE): pode usar, copiar, modificar e compartilhar à vontade. A licença não vale para o nome "Robô Ed" nem para o personagem original, que pertencem aos seus donos.
+
+O Stockfish não faz parte deste repositório: ele é um programa separado, sob a licença [GPL v3](https://github.com/official-stockfish/Stockfish/blob/master/Copying.txt), carregado do cdnjs quando você abre o xadrez.
 
 Achou um bug ou quer ensinar uma resposta nova pro Ed? Abre uma *issue* ou manda um *pull request*!

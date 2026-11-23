@@ -90,8 +90,8 @@
   function irPara(hash, focar) {
     var id = String(hash || '').replace(/^#/, '');
     if (SECOES.indexOf(id) < 0) id = 'converse';
-    if (secaoAtual === 'diversoes' && id !== 'diversoes') jogo.interromper();
     secaoAtual = id;
+    if (id === 'diversoes' && xadrezUI) xadrezUI.aquecer();
     $$('.secao').forEach(function (s) { s.classList.toggle('ativa', s.id === 'secao-' + id); });
     var sec = $('#secao-' + id);
     var titulo = sec.getAttribute('data-titulo');
@@ -381,118 +381,9 @@
   })();
 
   /* =========================================================
-     Diversões 1: Apague as luzes!
+     Diversões 1: xadrez contra o Ed (js/xadrez.js)
      ========================================================= */
-  var jogo = (function () {
-    var TOTAL = 20, LIMITE = 10, DURACAO = 40;
-    var predio = $('#predio'), msg = $('#jogo-msg'), msgTexto = $('#jogo-msg-texto'), btn = $('#jogo-iniciar');
-    var elPontos = $('#jogo-pontos'), elTempo = $('#jogo-tempo'), elAcesas = $('#jogo-acesas'), elRecorde = $('#jogo-recorde'), elKwh = $('#jogo-kwh');
-    var janelas = [], rodando = false, pontos = 0, tempo = DURACAO, acesas = 0, kwh = 0;
-    var tAcender = null, tRelogio = null;
-    var recorde = parseInt(ler('ed-recorde') || '0', 10) || 0;
-    elRecorde.textContent = recorde;
-
-    for (var i = 0; i < TOTAL; i++) {
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'janela';
-      b.setAttribute('aria-label', 'Janela ' + (i + 1));
-      b.addEventListener('click', apagar.bind(null, i));
-      predio.appendChild(b);
-      janelas.push(b);
-    }
-
-    function hud() {
-      elPontos.textContent = pontos;
-      elTempo.textContent = tempo;
-      elAcesas.textContent = acesas;
-      elKwh.textContent = 'Energia economizada: ' + kwh.toFixed(1).replace('.', ',') + ' kWh';
-    }
-
-    function acenderUma() {
-      var apagadas = janelas.filter(function (j) { return !j.classList.contains('acesa'); });
-      if (!apagadas.length) return;
-      apagadas[Math.floor(Math.random() * apagadas.length)].classList.add('acesa');
-      acesas++;
-      hud();
-      if (acesas >= LIMITE) { fim(false); return; }
-      if (acesas >= 7) Ed.humor('surpreso', 1200);
-    }
-
-    function agendar() {
-      var intervalo = Math.max(380, 900 - (DURACAO - tempo) * 13);
-      tAcender = setTimeout(function () {
-        if (!rodando) return;
-        acenderUma();
-        if (rodando) agendar();
-      }, intervalo);
-    }
-
-    function apagar(i) {
-      var j = janelas[i];
-      if (!rodando || !j.classList.contains('acesa')) return;
-      j.classList.remove('acesa');
-      acesas--;
-      pontos += 10;
-      kwh += 0.1;
-      bip('clique');
-      hud();
-    }
-
-    function iniciar() {
-      janelas.forEach(function (j) { j.classList.remove('acesa'); });
-      pontos = 0; tempo = DURACAO; acesas = 0; kwh = 0;
-      rodando = true;
-      msg.hidden = true;
-      hud();
-      acenderUma(); acenderUma();
-      agendar();
-      tRelogio = setInterval(function () {
-        tempo--;
-        hud();
-        if (tempo <= 0) fim(true);
-      }, 1000);
-      Ed.humor('feliz');
-      if (janelas[0]) janelas[0].focus({ preventScroll: true });
-    }
-
-    function parar() {
-      rodando = false;
-      clearTimeout(tAcender);
-      clearInterval(tRelogio);
-    }
-
-    function fim(venceu) {
-      parar();
-      var novo = pontos > recorde;
-      if (novo) { recorde = pontos; guardar('ed-recorde', recorde); elRecorde.textContent = recorde; }
-      var kwhTxt = kwh.toFixed(1).replace('.', ',');
-      if (venceu) {
-        msgTexto.innerHTML = '<b>Parabéns, Guardião da Energia!</b><br>Você aguentou os 40 segundos, fez ' + pontos + ' pontos e economizou ' + kwhTxt + ' kWh.' + (novo ? '<br>★ NOVO RECORDE! ★' : '');
-        Ed.falar(2400, 'feliz');
-        bip('vitoria');
-      } else {
-        msgTexto.innerHTML = '<b>Ih, desperdício total!</b><br>Dez luzes acesas ao mesmo tempo. Você fez ' + pontos + ' pontos.' + (novo ? '<br>★ Mas é um NOVO RECORDE! ★' : '');
-        Ed.humor('triste', 3500);
-        bip('erro');
-      }
-      btn.textContent = 'JOGAR DE NOVO';
-      msg.hidden = false;
-      btn.focus({ preventScroll: true });
-    }
-
-    function interromper() {
-      if (!rodando) return;
-      parar();
-      msgTexto.textContent = 'Jogo pausado enquanto você passeava pelo site. Bora de novo?';
-      btn.textContent = 'RECOMEÇAR';
-      msg.hidden = false;
-    }
-
-    btn.addEventListener('click', iniciar);
-    hud();
-    return { interromper: interromper };
-  })();
+  var xadrezUI = window.Xadrez ? Xadrez.montar($('#xadrez'), { bip: bip, foto: FOTOS_INBOT[0] }) : null;
 
   /* =========================================================
      Diversões 2: Quiz do Guardião da Energia

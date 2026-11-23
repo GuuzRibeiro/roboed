@@ -17,7 +17,7 @@ Este projeto recria o site dele com a estética de internet de antigamente: fund
   - Brinca de adivinhar um número, te faz perguntas de sim ou não, conta histórias e faz poemas.
   - Canta (em bipes) e pede arrego depois de um tempo. Pergunte se ele conhece o Latino!
   - Lembra o seu nome, faz contas e reclama se você repetir a mesma pergunta.
-- **Quem sou eu**: a ficha técnica do Ed e botões pra ver cada expressão dele.
+- **Quem sou eu**: a apresentação e a ficha técnica do Ed.
 - **Diversões**: o joguinho *Apague as luzes!* e um quiz pra descobrir se você é um Guardião da Energia.
 - **Meu blog**: posts do Ed de 2004 a 2016.
 - **Venha aprender**: dicas de economia por cômodo da casa e as fontes de energia.

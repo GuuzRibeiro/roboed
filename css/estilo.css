@@ -509,20 +509,7 @@ button { font-family: inherit; }
 .ficha th { width: 120px; color: #3a5f8f; white-space: nowrap; }
 .ficha tr:nth-child(odd) { background: #f1f6fc; }
 
-.caras-area { display: flex; align-items: flex-start; gap: 16px; }
-.caras-retrato {
-  flex: none;
-  width: 150px;
-  aspect-ratio: 200 / 210;
-  border: 3px solid #fff;
-  border-radius: 10px;
-  box-shadow: 0 0 0 1px #8fb0d3, 0 2px 5px rgba(0, 0, 0, .2);
-  overflow: hidden;
-  background: #ffd54f;
-}
-.caras-retrato svg { display: block; width: 100%; height: 100%; }
-.caras { display: flex; flex-wrap: wrap; align-content: flex-start; gap: 6px; }
-.caras button, .abas .aba {
+.abas .aba {
   padding: 5px 10px;
   font-family: var(--pixel);
   font-size: 10px;
@@ -532,8 +519,7 @@ button { font-family: inherit; }
   border-radius: 4px;
   cursor: pointer;
 }
-.caras button:hover, .abas .aba:hover { background: linear-gradient(#fffbe6, #ffe27a); }
-.caras button.ativo { background: linear-gradient(#ffe27a, #ffc93c); border-color: #c99a1c; }
+.abas .aba:hover { background: linear-gradient(#fffbe6, #ffe27a); }
 
 /* ---------------- blog ---------------- */
 .blog-cabecalho { display: flex; flex-direction: column; padding: 10px 12px; margin: -4px -6px 6px; background: linear-gradient(90deg, #f7941d, #ffc14d); border-radius: 6px; color: #fff; }
@@ -791,7 +777,5 @@ button { font-family: inherit; }
   .btn-enviar { padding: 0 12px; }
   .caixa { padding: 12px; }
   .ficha th { width: 96px; white-space: normal; }
-  .caras-area { gap: 10px; }
-  .caras-retrato { width: 104px; }
   .aba-indique { margin-left: 14px; }
 }

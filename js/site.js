@@ -313,19 +313,6 @@
     });
   })();
 
-  /* ---------------- caras do Ed (Quem sou eu) ---------------- */
-  // um Ed desenhado só pra esta seção, assim o retrato do lado não muda
-  var edCaras = Ed.criar($('#caras-retrato'));
-  $('#caras').addEventListener('click', function (e) {
-    var b = e.target.closest('button[data-humor]');
-    if (!b) return;
-    var h = b.getAttribute('data-humor');
-    if (h === 'falando') edCaras.falar(2600, 'feliz');
-    else { edCaras.calar(); edCaras.humor(h, 5000); }
-    $$('#caras button').forEach(function (x) { x.classList.toggle('ativo', x === b); });
-    bip('clique');
-  });
-
   /* ---------------- abas (Venha aprender) ---------------- */
   var abas = $$('.abas .aba');
   abas.forEach(function (b) {

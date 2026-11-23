@@ -6,6 +6,10 @@
    A chave é o nome em minúsculas e sem acento. Só o "d" é obrigatório.
    Cada item de "l" completa a frase "O nome Fulano me lembra ...".
 
+   APELIDOS: apelido: 'nome' (ou 'nome1|nome2' quando serve pra mais de um).
+     Os nomes do lado direito são chaves de NOMES; os que não estiverem lá
+     são ignorados. Assim o Ed sabe que Gui é de Guilherme.
+
    LUGARES: [nomes que a pessoa pode digitar (sem acento, separados por |), como mostrar, comentário, quem nasce lá]
    FAMOSOS: [nomes que a pessoa pode digitar, resposta, só responde se perguntarem? (true/false)]
    ========================================================= */
@@ -177,7 +181,33 @@
     vanessa: { d: 'Vanessa', x: 'Sabia que o nome Vanessa foi inventado pelo escritor Jonathan Swift, o mesmo de "As Viagens de Gulliver"?' },
     vitoria: { d: 'Vitória', s: 'vitória', l: ['a cidade de Vitória, capital do Espírito Santo'] },
     viviane: { d: 'Viviane', s: 'cheia de vida' },
-    yasmin: { d: 'Yasmin', s: 'flor de jasmim' }
+    yasmin: { d: 'Yasmin', s: 'flor de jasmim' },
+
+    /* ---------- nomes que completam os apelidos ---------- */
+    eduarda: { d: 'Eduarda', s: 'guardiã da riqueza', x: 'E ainda começa com Ed, igual a mim! Quase xarás.' },
+    daniela: { d: 'Daniela', s: 'Deus é minha juíza', l: ['a Daniela Mercury, cantora de axé lá da Bahia'] },
+    rafaela: { d: 'Rafaela', s: 'Deus cura' },
+    emanuel: { d: 'Emanuel', s: 'Deus está conosco' }
+  };
+
+  // apelido -> nome (ou nomes, separados por |)
+  var APELIDOS = {
+    gui: 'guilherme', gu: 'gustavo|guilherme', guto: 'gustavo|augusto',
+    rafa: 'rafael|rafaela', rafinha: 'rafael|rafaela',
+    gabi: 'gabriela|gabriel', biel: 'gabriel',
+    bia: 'beatriz|bianca', duda: 'eduarda|eduardo', dudu: 'eduardo', cadu: 'carlos',
+    ju: 'julia|juliana', juh: 'julia|juliana', lu: 'luiza|luisa|lucas', lulu: 'luiza|luisa',
+    nando: 'fernando', fer: 'fernanda|fernando', nanda: 'fernanda',
+    leo: 'leonardo', ze: 'jose', jao: 'joao', joaozinho: 'joao', pedrinho: 'pedro', paulinho: 'paulo',
+    bel: 'isabel|isabela|isabella', isa: 'isabela|isabella|isabel',
+    manu: 'manuela|emanuel', carol: 'carolina', dani: 'daniel|daniela', lari: 'larissa',
+    vini: 'vinicius', lipe: 'felipe', teteu: 'mateus|matheus', rique: 'henrique', nick: 'nicolas|nicollas',
+    rick: 'ricardo', digo: 'rodrigo', beto: 'roberto|alberto', toni: 'antonio', tonho: 'antonio',
+    thi: 'thiago|tiago', fabinho: 'fabio', carlinhos: 'carlos', cris: 'cristina|cristiano',
+    mari: 'mariana|maria', vivi: 'viviane', nati: 'natalia', nat: 'natalia', paty: 'patricia',
+    lele: 'leticia', cami: 'camila', mel: 'melissa', sofi: 'sofia|sophia', lau: 'laura',
+    dri: 'adriana', gi: 'giovana|giovanna|gisele', jess: 'jessica', bru: 'bruna|bruno',
+    vic: 'vitoria|victor|vitor', val: 'valentina', tati: 'tatiana'
   };
 
   // usado quando o Ed não conhece o nome: "começa com S, de Sol!"
@@ -220,7 +250,8 @@
     ['angola|luanda', 'Angola', 'Que legal, alguém de Angola! A gente fala a mesma língua, né?', 'angolano|angolana'],
     ['mocambique|maputo', 'Moçambique', 'Moçambique! Mais um país que fala português. Bem-vindo ao meu chat!', 'mocambicano|mocambicana'],
     ['japao|toquio', 'Japão', 'Konnichiwa! O Japão é cheio de robôs. Será que algum é meu primo?', 'japones|japonesa'],
-    ['estados unidos|eua|usa', 'Estados Unidos', 'Hello! Lá foi onde o Thomas Edison criou a lâmpada que deu certo, em 1879.', 'americano|americana']
+    ['estados unidos|eua|usa', 'Estados Unidos', 'Hello! Lá foi onde o Thomas Edison criou a lâmpada que deu certo, em 1879.', 'americano|americana'],
+    ['brasil|brazil', 'Brasil', 'O Brasil é campeão de energia renovável: a maior parte da nossa eletricidade vem da água, do vento e do sol. E ainda tem carro rodando com etanol!', 'brasileiro|brasileira']
   ];
 
   var FAMOSOS = [
@@ -265,5 +296,5 @@
     ['marcos pontes', 'Marcos Pontes, o primeiro astronauta brasileiro! Foi pra Estação Espacial Internacional em 2006.']
   ];
 
-  global.EdNomes = { nomes: NOMES, letras: LETRAS, lugares: LUGARES, famosos: FAMOSOS };
+  global.EdNomes = { nomes: NOMES, apelidos: APELIDOS, letras: LETRAS, lugares: LUGARES, famosos: FAMOSOS };
 })(typeof window !== 'undefined' ? window : globalThis);

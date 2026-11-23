@@ -457,7 +457,7 @@
 
     { id: 'tedio', prio: 7, h: 'piscando',
       p: [/\b(tedio|entediado|entediada|sem nada pra fazer|sem nada para fazer|de bobeira|nada pra fazer|nada para fazer)\b/],
-      r: ['Tédio? Que tal jogar {{Apague as luzes|#diversoes}} aqui no site? Ou me pede {{uma piada|conta uma piada}}!',
+      r: ['Tédio? Que tal {{jogar xadrez comigo|#diversoes}} aqui no site? Ou me pede {{uma piada|conta uma piada}}!',
           'Tédio é só energia parada! Bora usar: tenta o {{quiz do Guardião da Energia|#diversoes}}.'] },
 
     { id: 'ed_ai', prio: 6, h: 'feliz',
@@ -1079,7 +1079,7 @@
 
     { id: 'jogos_antigos', prio: 8, h: 'feliz',
       p: [/\b(habbo|club penguin|ragnarok|tibia|gunbound|mu online|counter strike|cs 1 6|neopets|miniclip|click jogos|clickjogos|super mario|sonic|snake|jogo da cobrinha|campo minado|pinball)\b/],
-      fn: function (m) { return { t: capitalizar(m[1]) + '? Clássico! Mas já experimentou o meu jogo? {{Apague as luzes|#diversoes}}, aqui no site.' }; } },
+      fn: function (m) { return { t: capitalizar(m[1]) + '? Clássico! Mas já tentou me ganhar no xadrez? {{Jogar xadrez comigo|#diversoes}}, aqui no site.' }; } },
 
     { id: 'chatgpt', prio: 8, h: 'piscando',
       p: [/\b(chatgpt|chat gpt|gpt|openai|gemini|copilot|claude|inteligencia artificial|ia generativa|llm)\b/],
@@ -1157,9 +1157,19 @@
         return { t: sacolaJogos.prox() };
       } },
 
-    { id: 'xadrez', prio: 8, h: 'feliz',
-      p: [/\bxadrez\b/],
-      r: ['Gosto de xadrez! Minha peça predileta é o cavalo: ele pula por cima de tudo, igual robô animado.'] },
+    // o xadrez contra o Ed fica na seção Diversões
+    { id: 'xadrez', prio: 8, h: 'piscando',
+      p: [/\b(xadrez|xeque mate|xeque|enxadrista)\b/],
+      fn: function (m, norm) {
+        if (/\b(vamos|bora|quer|quero|joga|jogar|jogamos|partida|desafio|desafiar|sabe)\b/.test(norm)) {
+          return { t: sorteia(['Bora! Mas já aviso: eu calculo um montão de lances por segundo. Arruma o tabuleiro: {{jogar xadrez comigo|#diversoes}}.',
+                               'Sei jogar, e jogo sério, hein! Duvido você me ganhar: {{jogar xadrez comigo|#diversoes}}.',
+                               'Xadrez é comigo mesmo! Meu processador já está esquentando os motores: {{jogar xadrez comigo|#diversoes}}.']) };
+        }
+        if (/\bxeque\b/.test(norm)) return { t: 'Xeque-mate é quando o rei fica sem saída! Quer ver se consegue fazer isso comigo? {{Jogar xadrez comigo|#diversoes}}.' };
+        return { t: sorteia(['Gosto de xadrez! Minha peça predileta é o cavalo: ele pula por cima de tudo, igual robô animado. Quer {{jogar xadrez comigo|#diversoes}}?',
+                             'Xadrez é meu jogo preferido! E o cavalo é a minha peça favorita, porque anda em L e pega todo mundo de surpresa. Topa {{uma partida|#diversoes}}?']) };
+      } },
 
     { id: 'prendas', prio: 8, h: 'feliz',
       p: [/\b(prenda|prendas|jogo das prendas)\b/],
@@ -1389,7 +1399,7 @@
           materia: 'Ciências! E um pouquinho de matemática, pra fazer as contas da economia.',
           livro: '"O Poço do Visconde", do Monteiro Lobato, em que a turma do Sítio vai atrás de petróleo!',
           desenho: 'Os Jetsons! Uma família do futuro cheia de robôs. A Rosie, a robô da casa, é minha ídola.',
-          jogo: 'O {{Apague as luzes|#diversoes}}, aqui do site! Sou meio suspeito pra falar.',
+          jogo: 'Xadrez! Minha peça preferida é o cavalo. Quer {{jogar xadrez comigo|#diversoes}}?',
           bebida: 'Água! Mas só um golinho, senão enferruja.',
           fruta: 'Laranja! Sabia que dá pra fazer uma pilha com frutas cítricas? Acho isso o máximo.',
           time: 'Meu time é o Ecológico Futebol Clube: só joga de dia, pra não gastar refletor! Hehe.',
@@ -1582,9 +1592,9 @@
     'Vou fingir que não ouvi. Sobre o que você quer conversar?'
   ]);
   var sacolaJogos = sacola([
-    'Conhece o jogo das prendas? Eu adoro! E já experimentou o meu jogo aqui do site? {{Apague as luzes|#diversoes}}!',
+    'Conhece o jogo das prendas? Eu adoro! E já tentou me ganhar no xadrez aqui do site? {{Jogar xadrez comigo|#diversoes}}!',
     'Jogos eletrônicos são legais! Só não esquece de desligar o videogame da tomada quando terminar.',
-    'Gosto de xadrez! Minha peça predileta é o cavalo. Mas aqui no site tem o {{Apague as luzes|#diversoes}}, bem mais rapidinho!'
+    'Meu jogo preferido é xadrez! Minha peça predileta é o cavalo. Duvido você me ganhar: {{jogar xadrez comigo|#diversoes}}.'
   ]);
   var VAZIO = sacola(['Pode perguntar! Estou aqui pra isso.', 'Hã? Você mandou uma mensagem vazia. Robô também não lê pensamento!']);
 

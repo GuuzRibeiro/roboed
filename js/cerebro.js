@@ -87,7 +87,7 @@
     ultimaNorm: '', repeticoes: 0, insultos: 0,
     tema: null, maisTexto: null, espera: null,
     aguardandoNome: false, pediuNome: false, ultimaResposta: '',
-    ultimaRegra: null, jogo: null, cantando: 0, aguaVezes: 0, lugar: null, palpiteApelido: null
+    ultimaRegra: null, jogo: null, cantando: 0, aguaVezes: 0, lugar: null, palpiteApelido: null, anoNasc: null
   };
 
   function sorteia(a) { return a[Math.floor(Math.random() * a.length)]; }
@@ -302,6 +302,35 @@
       if (f.re.test(norm) && (!f.amb || FALA_DE_ALGUEM.test(norm))) return f;
     }
     return null;
+  }
+
+  /* idade e ano em que a pessoa nasceu, comparados com a época do Ed (2004–2016) */
+  function suaEpoca(nasc) {
+    if (nasc > 2016) return 'Quando eu saí do ar, em 2016, você ainda nem tinha nascido! Que bom que me achou aqui.';
+    if (nasc >= 2004) return 'Então você nasceu quando eu já estava no ar! Eu estreei em 2004. Se conversou comigo, foi bem pequenininho.';
+    if (nasc >= 1996) return 'Então você era criança quando eu estava no ar! Aposto que já veio me perguntar coisa pra trabalho da escola. Hehe.';
+    return 'Aposto que você já conversou comigo lá em 2005, hein? Hehe.';
+  }
+  var FATOS_DO_ANO = {
+    1969: 'O ano em que o ser humano pisou na Lua pela primeira vez!',
+    1970: 'Ano do tri da Seleção, no México!',
+    1994: 'Ano do tetra da Seleção e do Plano Real!',
+    2000: 'Bem na virada do milênio!',
+    2002: 'Ano do penta da Seleção!',
+    2004: 'O mesmo ano em que eu entrei no ar! Somos da mesma safra.',
+    2005: 'Eu tinha acabado de fazer um aninho no ar! E foi o ano em que criaram o YouTube.',
+    2006: 'O ano em que Plutão deixou de ser planeta e o Marcos Pontes virou o primeiro astronauta brasileiro!',
+    2007: 'O ano em que anunciaram o petróleo do pré-sal, lá no fundo do mar!',
+    2014: 'Ano da Copa aqui no Brasil... melhor nem falar daquele placar contra a Alemanha.',
+    2016: 'O ano das Olimpíadas no Rio, e o ano em que eu saí do ar. Você chegou quando eu estava indo!'
+  };
+
+  // "que legal", "top demais": resposta que puxa o assunto de volta
+  function reagirBom() {
+    var t = sorteia(['Né? Eu também acho!', 'Também acho! Meus circuitos até brilharam.', 'Legal mesmo! Fico feliz que você gostou.', 'Demais, né? Eu adoro esse tipo de assunto.']);
+    var segue = { dicas: '{{Quer mais uma dica?|mais uma dica}}', curiosidades: '{{Quer outra curiosidade?|mais uma curiosidade}}',
+                  piadas: '{{Quer outra piada?|outra piada}}', agua: '{{Quer outra dica de água?|outra dica de água}}' }[ctx.tema];
+    return { t: t + ' ' + (segue || sorteia(['Pergunta mais!', 'Quer saber mais alguma coisa?', 'Sobre o que mais você quer conversar?'])) };
   }
 
   /* "o que você acha de X?" / "você gosta de X?": em vez de uma resposta
@@ -1447,15 +1476,42 @@
 
     { id: 'idade_usuario', prio: 8, h: 'surpreso',
       p: [/\b(?:eu )?tenho (\d{1,3}) anos\b/],
+      // ctx.idade e ctx.anoNasc guardam só o que a pessoa disse de verdade,
+      // pra o Ed comparar a idade com o ano em que ela nasceu
       fn: function (m) {
-        var n = parseInt(m[1], 10);
+        var n = parseInt(m[1], 10), nasc = new Date().getFullYear() - n, ano = ctx.anoNasc;
         ctx.idade = n;
-        if (n < 7) return { t: n + ' anos e já digitando? Que fera! Pede pra alguém mais velho te ajudar a apagar a luz quando sair do quarto, combinado?' };
-        if (n < 13) return { t: n + ' anos? Que legal! Sabia que criança é ótima fiscal de energia? Fica de olho em quem deixa a luz acesa à toa!' };
-        if (n < 18) return { t: n + ' anos! Idade ótima pra aprender sobre energia e mudar o mundo. Vai fazer vestibular pra quê?' };
-        if (n < 60) return { t: n + ' anos? Aposto que você já conversou comigo lá em 2005, hein? Hehe.' };
-        if (n < 120) return { t: n + ' anos! Que experiência! Você viu muita coisa mudar no mundo da energia, né?' };
+        if (ano && Math.abs(nasc - ano) > 1) {
+          ctx.anoNasc = null;   // vale o que ela disse por último
+          return { t: 'Ué, mas você não disse que nasceu em ' + ano + '? Pela minha calculadora, quem tem ' + n + ' anos nasceu lá por ' + nasc + '. Hehe.', h: 'pensando' };
+        }
+        var inicio = ano ? n + ' anos, bate certinho com ' + ano + '! ' : '';
+        if (n < 7) return { t: (inicio || n + ' anos e já digitando? ') + 'Que fera! Pede pra alguém mais velho te ajudar a apagar a luz quando sair do quarto, combinado?' };
+        if (n < 13) return { t: (inicio || n + ' anos? Que legal! ') + 'Sabia que criança é ótima fiscal de energia? Fica de olho em quem deixa a luz acesa à toa!' };
+        if (n < 18) return { t: (inicio || n + ' anos! ') + 'Idade ótima pra aprender sobre energia e mudar o mundo. Vai fazer vestibular pra quê?' };
+        if (n < 60) return { t: (inicio || n + ' anos? ') + suaEpoca(nasc) };
+        if (n < 120) return { t: (inicio || n + ' anos! ') + 'Que experiência! Você viu muita coisa mudar no mundo da energia, né?' };
         return { t: n + ' anos?! Você é mais velho que eu! Ou é de outro planeta também?', h: 'piscando' };
+      } },
+
+    // "nasci em 2006", "eu tinha nascido em 2006", "sou de 2006"
+    { id: 'ano_nascimento', prio: 8, h: 'surpreso',
+      p: [/\bnasci(?:do|da)? (?:em|no ano de|no ano|no final de|no comeco de|no inicio de) (\d{4})\b/, /\b(?:sou|eu sou) (?:de|do ano de) (\d{4})\b/],
+      fn: function (m) {
+        var ano = parseInt(m[1], 10), atual = new Date().getFullYear();
+        if (ano > atual) return { t: 'Em ' + ano + '?! Então você veio do futuro! Me conta: lá ainda tem gente deixando a luz acesa à toa?', h: 'surpreso' };
+        if (ano < atual - 120) return { t: 'Em ' + ano + '? Aí você seria mais velho que a lâmpada elétrica! Acho que você digitou errado. Hehe.', h: 'piscando' };
+        var idade = atual - ano, antes = ctx.idade;
+        ctx.anoNasc = ano;
+        var bate = antes != null && Math.abs(antes - idade) <= 1;
+        if (antes != null && !bate) ctx.idade = null;   // vale o que ela disse por último
+        var conta = bate
+          ? 'Bate com os seus ' + antes + ' anos, minha calculadora conferiu!'
+          : antes != null
+            ? 'Ué, mas você não disse que tinha ' + antes + ' anos? Pela minha conta, quem nasceu em ' + ano + ' tem uns ' + idade + '.'
+            : 'Então você tem uns ' + idade + ' anos!';
+        var extra = ' ' + (FATOS_DO_ANO[ano] || suaEpoca(ano));
+        return { t: ano + '! ' + conta + extra };
       } },
 
     { id: 'usuario_eu_sou', prio: 4, h: 'piscando',
@@ -1510,12 +1566,12 @@
     { id: 'reacao_boa', prio: 4, h: 'feliz',
       p: [/^(?:(?:nossa|caramba|uau|eita|ah|ai|po|poxa|nossa senhora) )?(?:que |muito |mo |mt |super |bem )?(legal|massa|show|show de bola|top|irado|maneiro|da hora|dahora|daora|bacana|incrivel|demais|interessante|sensacional|perfeito|genial|fofo|brabo|lindo)(?: (?:demais|d+mais|mesmo|hein|ne|ed|cara|mano|vei))*$/,
           /^(adorei|amei|gostei|curti|que bom)(?: (?:muito|demais|mesmo|ed))*$/],
-      fn: function () {
-        var t = sorteia(['Né? Eu também acho!', 'Também acho! Meus circuitos até brilharam.', 'Legal mesmo! Fico feliz que você gostou.', 'Demais, né? Eu adoro esse tipo de assunto.']);
-        var segue = { dicas: '{{Quer mais uma dica?|mais uma dica}}', curiosidades: '{{Quer outra curiosidade?|mais uma curiosidade}}',
-                      piadas: '{{Quer outra piada?|outra piada}}', agua: '{{Quer outra dica de água?|outra dica de água}}' }[ctx.tema];
-        return { t: t + ' ' + (segue || sorteia(['Pergunta mais!', 'Quer saber mais alguma coisa?', 'Sobre o que mais você quer conversar?'])) };
-      } },
+      fn: reagirBom },
+
+    // "que legal, ..." seguido de algo que o Ed não entendeu: pelo menos reage
+    { id: 'reacao_inicio', prio: 1, h: 'feliz',
+      p: [/^(?:(?:nossa|caramba|uau|eita|ah|poxa) )?(?:que |muito )?(legal|massa|show|top|irado|maneiro|da hora|bacana|incrivel|demais|interessante|sensacional|genial)\b/],
+      fn: reagirBom },
 
     { id: 'reacao_duvida', prio: 4, h: 'piscando',
       p: [/^(?:e )?(serio|jura|mentira|duvido|e mesmo|nao acredito|ta brincando|esta brincando|fala serio)(?: (?:mesmo|ne|ed|hein|cara|mano|isso))*$/],
@@ -1869,7 +1925,7 @@
       ctx.nome = null; ctx.idade = null; ctx.turnos = 0; ctx.respostas = 0; ctx.ultimaNorm = '';
       ctx.repeticoes = 0; ctx.insultos = 0; ctx.tema = null; ctx.maisTexto = null; ctx.espera = null;
       ctx.aguardandoNome = false; ctx.pediuNome = false; ctx.ultimaResposta = '';
-      ctx.ultimaRegra = null; ctx.jogo = null; ctx.cantando = 0; ctx.aguaVezes = 0; ctx.lugar = null; ctx.palpiteApelido = null;
+      ctx.ultimaRegra = null; ctx.jogo = null; ctx.cantando = 0; ctx.aguaVezes = 0; ctx.lugar = null; ctx.palpiteApelido = null; ctx.anoNasc = null;
     }
   };
   global.Cerebro = api;
